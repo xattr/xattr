@@ -1,0 +1,8 @@
+include *.txt setup.py MANIFEST.in
+graft Lib
+graft Modules
+graft _build
+global-exclude .DS_store
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude .*.swp
