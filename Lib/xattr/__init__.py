@@ -122,7 +122,7 @@ class xattr(object):
 
     __iter__ = iterkeys
 
-    def has_key(self):
+    def has_key(self, item):
         try:
             self.get(item)
         except IOError:
