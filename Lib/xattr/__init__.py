@@ -106,7 +106,10 @@ class xattr(object):
         return len(self.list())
 
     def __delitem__(self, item):
-        self.remove(item)
+        try:
+            self.remove(item)
+        except IOError:
+            raise KeyError(item)
     
     def __setitem__(self, item, value):
         self.set(item, value)
