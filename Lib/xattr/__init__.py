@@ -179,7 +179,7 @@ def listxattr(f, symlink=False):
 
 def getxattr(f, attr, symlink=False):
     __doc__ = xattr.get.__doc__
-    return xattr(f).get(options=symlink and XATTR_NOFOLLOW or 0)
+    return xattr(f).get(attr, options=symlink and XATTR_NOFOLLOW or 0)
 
 def setxattr(f, attr, value, options=0, symlink=False):
     __doc__ = xattr.set.__doc__
