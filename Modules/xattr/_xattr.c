@@ -43,14 +43,14 @@ static ssize_t xattr_removexattr(const char *path, const char *name, int options
         return -1;
     }
     if (options & XATTR_XATTR_NOFOLLOW) {
-        return lremovexattr(path, name, value);
+        return lremovexattr(path, name);
     } else {
-        return removexattr(path, name, value);
+        return removexattr(path, name);
     }
 }
 
 
-static ssize_t xattr_listxattr(const char *path, const char *namebuf, size_t size, int options) {
+static ssize_t xattr_listxattr(const char *path, char *namebuf, size_t size, int options) {
     if (!(options == 0 || options == XATTR_XATTR_NOFOLLOW)) {
         return -1;
     }
@@ -100,12 +100,12 @@ static ssize_t xattr_fremovexattr(int fd, const char *name, int options) {
     if (options & XATTR_XATTR_NOFOLLOW) {
         return -1;
     } else {
-        return fremovexattr(fd, name, value);
+        return fremovexattr(fd, name);
     }
 }
 
 
-static ssize_t xattr_flistxattr(int fd, const char *namebuf, size_t size, int options) {
+static ssize_t xattr_flistxattr(int fd, char *namebuf, size_t size, int options) {
     if (!(options == 0 || options == XATTR_XATTR_NOFOLLOW)) {
         return -1;
     }
