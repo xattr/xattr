@@ -3,15 +3,15 @@
 import distutils
 from distutils.core import setup, Extension
 
-VERSION = '0.1'
-DESCRIPTION = "Python wrapper for Darwin's extended filesystem attributes"
+VERSION = '0.2'
+DESCRIPTION = "Python wrapper for extended filesystem attributes"
 LONG_DESCRIPTION = """
 Extended attributes extend the basic attributes of files and directories
 in the file system.  They are stored as name:data pairs associated with
 file system objects (files, directories, symlinks, etc).
 
-Extended attributes are currently only available on Darwin 8.0 and later.
-This corresponds to Mac OS X 10.4 (Tiger).
+Extended attributes are currently only available on Darwin 8.0+ (Max OS X 10.4)
+and Linux 2.6+.
 """
 
 CLASSIFIERS = filter(None,
@@ -21,6 +21,7 @@ Intended Audience :: Developers
 License :: OSI Approved :: MIT License
 Natural Language :: English
 Operating System :: MacOS :: MacOS X
+Operating System :: POSIX :: Linux
 Programming Language :: Python
 Topic :: Software Development :: Libraries :: Python Modules
 """.splitlines())
@@ -36,7 +37,7 @@ setup(
     url="http://undefined.org/python/#xattr",
     license="MIT License",
     packages=['xattr'],
-    platforms=['MacOS X'],
+    platforms=['MacOS X', 'Linux'],
     package_dir={'xattr': 'Lib/xattr'},
     ext_modules=[
         Extension("xattr._xattr", ["Modules/xattr/_xattr.c"]),

@@ -1,5 +1,131 @@
 #include "Python.h"
 #include <sys/xattr.h>
+#ifndef XATTR_NOFOLLOW
+/* Linux compatibility API */
+#define XATTR_XATTR_NOFOLLOW 0x0001
+#define XATTR_XATTR_CREATE 0x0002
+#define XATTR_XATTR_REPLACE 0x0004
+#define XATTR_XATTR_NOSECURITY 0x0008
+static ssize_t xattr_getxattr(const char *path, const char *name, void *value, ssize_t size, u_int32_t position, int options) {
+    if (position != 0 || !(options == 0 || options == XATTR_XATTR_NOFOLLOW)) {
+        return -1;
+    }
+    if (options & XATTR_XATTR_NOFOLLOW) {
+        return lgetxattr(path, name, value, size);
+    } else {
+        return getxattr(path, name, value, size);
+    }
+}
+
+static ssize_t xattr_setxattr(const char *path, const char *name, void *value, ssize_t size, u_int32_t position, int options) {
+    int nofollow;
+    if (position != 0) {
+        return -1;
+    }
+    nofollow = options & XATTR_XATTR_NOFOLLOW;
+    options &= ~XATTR_XATTR_NOFOLLOW;
+    if (options == XATTR_XATTR_CREATE) {
+        options = XATTR_CREATE;
+    } else if (options == XATTR_XATTR_REPLACE) {
+        options = XATTR_REPLACE;
+    } else if (options != 0) {
+        return -1;
+    }
+    if (options & XATTR_XATTR_NOFOLLOW) {
+        return lsetxattr(path, name, value, size, options);
+    } else {
+        return setxattr(path, name, value, size, options);
+    }
+}
+
+static ssize_t xattr_removexattr(const char *path, const char *name, int options) {
+    if (position != 0 || !(options == 0 || options == XATTR_XATTR_NOFOLLOW)) {
+        return -1;
+    }
+    if (options & XATTR_XATTR_NOFOLLOW) {
+        return lremovexattr(path, name, value);
+    } else {
+        return removexattr(path, name, value);
+    }
+}
+
+
+static ssize_t xattr_listxattr(const char *path, const char *name, int options) {
+    if (position != 0 || !(options == 0 || options == XATTR_XATTR_NOFOLLOW)) {
+        return -1;
+    }
+    if (options & XATTR_XATTR_NOFOLLOW) {
+        return llistxattr(path, name, value);
+    } else {
+        return listxattr(path, name, value);
+    }
+}
+
+static ssize_t xattr_fgetxattr(int fd, const char *name, void *value, ssize_t size, u_int32_t position, int options) {
+    if (position != 0 || !(options == 0 || options == XATTR_XATTR_NOFOLLOW)) {
+        return -1;
+    }
+    if (options & XATTR_XATTR_NOFOLLOW) {
+        return -1;
+    } else {
+        return fgetxattr(fd, name, value, size);
+    }
+}
+
+static ssize_t xattr_fsetxattr(int fd, const char *name, void *value, ssize_t size, u_int32_t position, int options) {
+    int nofollow;
+    if (position != 0) {
+        return -1;
+    }
+    nofollow = options & XATTR_XATTR_NOFOLLOW;
+    options &= ~XATTR_XATTR_NOFOLLOW;
+    if (options == XATTR_XATTR_CREATE) {
+        options = XATTR_CREATE;
+    } else if (options == XATTR_XATTR_REPLACE) {
+        options = XATTR_REPLACE;
+    } else if (options != 0) {
+        return -1;
+    }
+    if (options & XATTR_XATTR_NOFOLLOW) {
+        return -1;
+    } else {
+        return fsetxattr(fd, name, value, size, options);
+    }
+}
+
+static ssize_t xattr_fremovexattr(int fd, const char *name, int options) {
+    if (position != 0 || !(options == 0 || options == XATTR_XATTR_NOFOLLOW)) {
+        return -1;
+    }
+    if (options & XATTR_XATTR_NOFOLLOW) {
+        return -1;
+    } else {
+        return fremovexattr(fd, name, value);
+    }
+}
+
+
+static ssize_t xattr_flistxattr(int fd, const char *name, int options) {
+    if (position != 0 || !(options == 0 || options == XATTR_XATTR_NOFOLLOW)) {
+        return -1;
+    }
+    if (options & XATTR_XATTR_NOFOLLOW) {
+        return -1;
+    } else {
+        return flistxattr(fd, name, value);
+    }
+}
+
+#else
+#define xattr_getxattr getxattr
+#define xattr_fgetxattr fgetxattr
+#define xattr_removexattr removexattr
+#define xattr_fremovexattr fremovexattr
+#define xattr_setxattr setxattr
+#define xattr_fsetxattr fsetxattr
+#define xattr_listxattr listxattr
+#define xattr_flistxattr flistxattr
+#endif
 
 static PyObject *xattr_error(void);
 static PyObject *xattr_error_with_filename(char *name);
@@ -43,7 +169,7 @@ py_getxattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , PyO
     }
     if (size == 0) {
         Py_BEGIN_ALLOW_THREADS
-        res = getxattr((const char *)path, (const char *)name, NULL, 0, position, options);
+        res = xattr_getxattr((const char *)path, (const char *)name, NULL, 0, position, options);
         Py_END_ALLOW_THREADS
         if (res == -1) {    
             return xattr_error_with_filename(path);
@@ -55,7 +181,7 @@ py_getxattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , PyO
         return NULL;
     }
     Py_BEGIN_ALLOW_THREADS
-    res = getxattr((const char *)path, (const char *)name, (void *)PyString_AS_STRING(buffer), size, position, options);
+    res = xattr_getxattr((const char *)path, (const char *)name, (void *)PyString_AS_STRING(buffer), size, position, options);
     Py_END_ALLOW_THREADS
     if (res == -1) {
         Py_DECREF(buffer);
@@ -94,7 +220,7 @@ py_fgetxattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , Py
     }
     if (size == 0) {
         Py_BEGIN_ALLOW_THREADS
-        res = fgetxattr(fd, (const char *)name, NULL, 0, position, options);
+        res = xattr_fgetxattr(fd, (const char *)name, NULL, 0, position, options);
         Py_END_ALLOW_THREADS
         if (res == -1) {    
             return xattr_error();
@@ -106,7 +232,7 @@ py_fgetxattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , Py
         return NULL;
     }
     Py_BEGIN_ALLOW_THREADS
-    res = fgetxattr(fd, (const char *)name, (void *)PyString_AS_STRING(buffer), size, position, options);
+    res = xattr_fgetxattr(fd, (const char *)name, (void *)PyString_AS_STRING(buffer), size, position, options);
     Py_END_ALLOW_THREADS
     if (res == -1) {
         Py_DECREF(buffer);
@@ -144,7 +270,7 @@ py_setxattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , PyO
         return NULL;
     }
     Py_BEGIN_ALLOW_THREADS
-    res = setxattr((const char *)path, (const char *)name, (void *)value, size, position, options);
+    res = xattr_setxattr((const char *)path, (const char *)name, (void *)value, size, position, options);
     Py_END_ALLOW_THREADS
     if (res) {
         return xattr_error_with_filename(path);
@@ -179,7 +305,7 @@ py_fsetxattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , Py
         return NULL;
     }
     Py_BEGIN_ALLOW_THREADS
-    res = fsetxattr(fd, (const char *)name, (void *)value, size, position, options);
+    res = xattr_fsetxattr(fd, (const char *)name, (void *)value, size, position, options);
     Py_END_ALLOW_THREADS
     if (res) {
         return xattr_error();
@@ -209,7 +335,7 @@ py_removexattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , 
         return NULL;
     }
     Py_BEGIN_ALLOW_THREADS
-    res = removexattr((const char *)path, (const char *)name, options);
+    res = xattr_removexattr((const char *)path, (const char *)name, options);
     Py_END_ALLOW_THREADS
     if (res) {
         return xattr_error_with_filename(path);
@@ -239,7 +365,7 @@ py_fremovexattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* ,
         return NULL;
     }
     Py_BEGIN_ALLOW_THREADS
-    res = fremovexattr(fd, (const char *)name, options);
+    res = xattr_fremovexattr(fd, (const char *)name, options);
     Py_END_ALLOW_THREADS
     if (res) {
         return xattr_error();
@@ -268,7 +394,7 @@ py_listxattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , Py
         return NULL;
     }
     Py_BEGIN_ALLOW_THREADS
-    res = listxattr((const char *)path, NULL, 0, options);
+    res = xattr_listxattr((const char *)path, NULL, 0, options);
     Py_END_ALLOW_THREADS
     if (res == -1) {    
         return xattr_error_with_filename(path);
@@ -278,7 +404,7 @@ py_listxattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , Py
         return NULL;
     }
     Py_BEGIN_ALLOW_THREADS
-    res = listxattr((const char *)path, (void *)PyString_AS_STRING(buffer), (size_t)PyString_GET_SIZE(buffer), options);
+    res = xattr_listxattr((const char *)path, (void *)PyString_AS_STRING(buffer), (size_t)PyString_GET_SIZE(buffer), options);
     Py_END_ALLOW_THREADS
     if (res == -1) {
         Py_DECREF(buffer);
@@ -310,7 +436,7 @@ py_flistxattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , P
         return NULL;
     }
     Py_BEGIN_ALLOW_THREADS
-    res = flistxattr(fd, NULL, 0, options);
+    res = xattr_flistxattr(fd, NULL, 0, options);
     Py_END_ALLOW_THREADS
     if (res == -1) {    
         return xattr_error();
@@ -320,7 +446,7 @@ py_flistxattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , P
         return NULL;
     }
     Py_BEGIN_ALLOW_THREADS
-    res = flistxattr(fd, (void *)PyString_AS_STRING(buffer), (size_t)PyString_GET_SIZE(buffer), options);
+    res = xattr_flistxattr(fd, (void *)PyString_AS_STRING(buffer), (size_t)PyString_GET_SIZE(buffer), options);
     Py_END_ALLOW_THREADS
     if (res == -1) {
         Py_DECREF(buffer);
