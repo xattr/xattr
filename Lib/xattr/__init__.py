@@ -171,3 +171,19 @@ class xattr(object):
 
     def items(self):
         return list(self.iteritems())
+
+
+def listxattr(f, symlink=False):
+    return tuple(xattr(f).list(options=symlink and XATTR_NOFOLLOW or 0))
+
+def getxattr(f, attr, symlink=False):
+    return xattr(f).get(options=symlink and XATTR_NOFOLLOW or 0)
+
+def setxattr(f, attr, value, options=0, symlink=False):
+    if symlink:
+        options |= XATTR_NOFOLLOW
+    return xattr(f).set(attr, value, options=options)
+
+def removexattr(f, attr, symlink=False):
+    options = symlink and XATTR_NOFOLLOW or 0
+    return xattr(f).remove(attr, options=options)
