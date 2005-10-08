@@ -39,7 +39,7 @@ static ssize_t xattr_setxattr(const char *path, const char *name, void *value, s
 }
 
 static ssize_t xattr_removexattr(const char *path, const char *name, int options) {
-    if (position != 0 || !(options == 0 || options == XATTR_XATTR_NOFOLLOW)) {
+    if (!(options == 0 || options == XATTR_XATTR_NOFOLLOW)) {
         return -1;
     }
     if (options & XATTR_XATTR_NOFOLLOW) {
@@ -50,14 +50,14 @@ static ssize_t xattr_removexattr(const char *path, const char *name, int options
 }
 
 
-static ssize_t xattr_listxattr(const char *path, const char *name, int options) {
-    if (position != 0 || !(options == 0 || options == XATTR_XATTR_NOFOLLOW)) {
+static ssize_t xattr_listxattr(const char *path, const char *namebuf, size_t size, int options) {
+    if (!(options == 0 || options == XATTR_XATTR_NOFOLLOW)) {
         return -1;
     }
     if (options & XATTR_XATTR_NOFOLLOW) {
-        return llistxattr(path, name, value);
+        return llistxattr(path, namebuf, size);
     } else {
-        return listxattr(path, name, value);
+        return listxattr(path, namebuf, size);
     }
 }
 
@@ -94,7 +94,7 @@ static ssize_t xattr_fsetxattr(int fd, const char *name, void *value, ssize_t si
 }
 
 static ssize_t xattr_fremovexattr(int fd, const char *name, int options) {
-    if (position != 0 || !(options == 0 || options == XATTR_XATTR_NOFOLLOW)) {
+    if (!(options == 0 || options == XATTR_XATTR_NOFOLLOW)) {
         return -1;
     }
     if (options & XATTR_XATTR_NOFOLLOW) {
@@ -105,14 +105,14 @@ static ssize_t xattr_fremovexattr(int fd, const char *name, int options) {
 }
 
 
-static ssize_t xattr_flistxattr(int fd, const char *name, int options) {
-    if (position != 0 || !(options == 0 || options == XATTR_XATTR_NOFOLLOW)) {
+static ssize_t xattr_flistxattr(int fd, const char *namebuf, size_t size, int options) {
+    if (!(options == 0 || options == XATTR_XATTR_NOFOLLOW)) {
         return -1;
     }
     if (options & XATTR_XATTR_NOFOLLOW) {
         return -1;
     } else {
-        return flistxattr(fd, name, value);
+        return flistxattr(fd, namebuf, size);
     }
 }
 
