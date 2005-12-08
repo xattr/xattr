@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 
-import distutils
-from distutils.core import setup, Extension
+import ez_setup
+ez_setup.use_setuptools()
+
+from setuptools import setup, Extension
 
 VERSION = '0.2'
 DESCRIPTION = "Python wrapper for extended filesystem attributes"
@@ -42,4 +44,5 @@ setup(
     ext_modules=[
         Extension("xattr._xattr", ["Modules/xattr/_xattr.c"]),
     ],
+    zip_safe=False,
 )
