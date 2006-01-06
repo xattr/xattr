@@ -19,7 +19,8 @@ def usage(e=None):
         print e
         print ""
 
-    print "usage: %s [-l] file [attr_name [attr_value]]" % (sys.argv[0],)
+    name = os.path.basename(sys.argv[0])
+    print "usage: %s [-l] file [attr_name [attr_value]]" % (name,)
     print "  -l: print long format (attr_name: attr_value) when listing xattrs"
     print "  With no optional arguments, lists the xattrs on file"
     print "  With attr_name only, lists the contents of attr_name on file"
