@@ -1,6 +1,6 @@
 Metadata-Version: 1.0
 Name: xattr
-Version: 0.2
+Version: 0.2dev-r724
 Summary: Python wrapper for extended filesystem attributes
 Home-page: http://undefined.org/python/#xattr
 Author: Bob Ippolito

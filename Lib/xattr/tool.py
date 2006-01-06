@@ -49,9 +49,13 @@ def main():
         usage("No file argument")
 
     if args:
-        attr_name  = args.pop(0)
+        attr_name = args.pop(0)
+    else:
+        attr_name = None
     if args:
         attr_value = args.pop(0)
+    else:
+        attr_value = None
 
     ##
     # Do The Right Thing
