@@ -44,5 +44,10 @@ setup(
     ext_modules=[
         Extension("xattr._xattr", ["Modules/xattr/_xattr.c"]),
     ],
+    entry_points={
+        'console_scripts': [
+            "xattr = xattr.tool:main",
+        ],
+    },
     zip_safe=False,
 )
