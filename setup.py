@@ -5,7 +5,7 @@ ez_setup.use_setuptools()
 
 from setuptools import setup, Extension
 
-VERSION = '0.2'
+VERSION = '0.3'
 DESCRIPTION = "Python wrapper for extended filesystem attributes"
 LONG_DESCRIPTION = """
 Extended attributes extend the basic attributes of files and directories
@@ -39,7 +39,7 @@ setup(
     url="http://undefined.org/python/#xattr",
     license="MIT License",
     packages=['xattr'],
-    platforms=['MacOS X', 'Linux'],
+    platforms=['MacOS X', 'Linux', 'FreeBSD'],
     package_dir={'xattr': 'Lib/xattr'},
     ext_modules=[
         Extension("xattr._xattr", ["Modules/xattr/_xattr.c"]),
