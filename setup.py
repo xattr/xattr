@@ -24,6 +24,7 @@ License :: OSI Approved :: MIT License
 Natural Language :: English
 Operating System :: MacOS :: MacOS X
 Operating System :: POSIX :: Linux
+Operating System :: POSIX :: FreeBSD
 Programming Language :: Python
 Topic :: Software Development :: Libraries :: Python Modules
 """.splitlines()))
