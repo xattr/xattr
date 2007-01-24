@@ -398,21 +398,31 @@ py_getxattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , PyO
         res = xattr_getxattr((const char *)path, (const char *)name, NULL, 0, position, options);
         Py_END_ALLOW_THREADS
         if (res == -1) {    
-            return xattr_error_with_filename(path);
+            PyObject *tmp = xattr_error_with_filename(path);
+            PyMem_Free(path);
+            PyMem_Free(name);
+            return tmp;
         }
         size = res;
     }
     buffer = PyString_FromStringAndSize((char *)NULL, size);
     if (buffer == NULL) {
+        PyMem_Free(path);
+        PyMem_Free(name);
         return NULL;
     }
     Py_BEGIN_ALLOW_THREADS
     res = xattr_getxattr((const char *)path, (const char *)name, (void *)PyString_AS_STRING(buffer), size, position, options);
     Py_END_ALLOW_THREADS
     if (res == -1) {
+        PyObject *tmp = xattr_error_with_filename(path);
         Py_DECREF(buffer);
-        return xattr_error_with_filename(path);
+        PyMem_Free(path);
+        PyMem_Free(name);
+        return tmp;
     }
+    PyMem_Free(path);
+    PyMem_Free(name);
     if (res != size) {
         _PyString_Resize(&buffer, (int)res);
     }
@@ -449,17 +459,20 @@ py_fgetxattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , Py
         res = xattr_fgetxattr(fd, (const char *)name, NULL, 0, position, options);
         Py_END_ALLOW_THREADS
         if (res == -1) {    
+            PyMem_Free(name);
             return xattr_error();
         }
         size = res;
     }
     buffer = PyString_FromStringAndSize((char *)NULL, size);
     if (buffer == NULL) {
+        PyMem_Free(name);
         return NULL;
     }
     Py_BEGIN_ALLOW_THREADS
     res = xattr_fgetxattr(fd, (const char *)name, (void *)PyString_AS_STRING(buffer), size, position, options);
     Py_END_ALLOW_THREADS
+    PyMem_Free(name);
     if (res == -1) {
         Py_DECREF(buffer);
         return xattr_error();
@@ -479,6 +492,7 @@ static PyObject*
 py_setxattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , PyObject *kwds) */
 {
     /* static char *keywords[] = { "path", "name", "value", "position", "options", NULL }; */
+    PyObject *result;
     char *path;
     char *name;
     int options = 0;
@@ -499,10 +513,14 @@ py_setxattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , PyO
     res = xattr_setxattr((const char *)path, (const char *)name, (void *)value, size, position, options);
     Py_END_ALLOW_THREADS
     if (res) {
-        return xattr_error_with_filename(path);
+        result = xattr_error_with_filename(path);
+    } else {
+        Py_INCREF(Py_None);
+        result = Py_None;
     }
-    Py_INCREF(Py_None);
-    return Py_None;
+    PyMem_Free(path);
+    PyMem_Free(name);
+    return result;
 }
 
 PyDoc_STRVAR(pydoc_fsetxattr,
@@ -533,6 +551,7 @@ py_fsetxattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , Py
     Py_BEGIN_ALLOW_THREADS
     res = xattr_fsetxattr(fd, (const char *)name, (void *)value, size, position, options);
     Py_END_ALLOW_THREADS
+    PyMem_Free(name);
     if (res) {
         return xattr_error();
     }
@@ -553,6 +572,7 @@ py_removexattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , 
     char *name;
     int options = 0;
     int res;
+    PyObject *result;
     if (!PyArg_ParseTuple(args, /* AndKeywords(args, kwds, */
             "etet|i:removexattr", /* keywords, */
             Py_FileSystemDefaultEncoding, &path,
@@ -564,10 +584,14 @@ py_removexattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , 
     res = xattr_removexattr((const char *)path, (const char *)name, options);
     Py_END_ALLOW_THREADS
     if (res) {
-        return xattr_error_with_filename(path);
+        result = xattr_error_with_filename(path);
+    } else {
+        Py_INCREF(Py_None);
+        result = Py_None;
     }
-    Py_INCREF(Py_None);
-    return Py_None;
+    PyMem_Free(path);
+    PyMem_Free(name);
+    return result;
 }
 
 PyDoc_STRVAR(pydoc_fremovexattr,
@@ -593,6 +617,7 @@ py_fremovexattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* ,
     Py_BEGIN_ALLOW_THREADS
     res = xattr_fremovexattr(fd, (const char *)name, options);
     Py_END_ALLOW_THREADS
+    PyMem_Free(name);
     if (res) {
         return xattr_error();
     }
@@ -623,19 +648,25 @@ py_listxattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , Py
     res = xattr_listxattr((const char *)path, NULL, 0, options);
     Py_END_ALLOW_THREADS
     if (res == -1) {    
-        return xattr_error_with_filename(path);
+        PyObject *tmp = xattr_error_with_filename(path);
+        PyMem_Free(path);
+        return tmp;
     }
     buffer = PyString_FromStringAndSize((char *)NULL, (int)res);
     if (buffer == NULL) {
+        PyMem_Free(path);
         return NULL;
     }
     Py_BEGIN_ALLOW_THREADS
     res = xattr_listxattr((const char *)path, (void *)PyString_AS_STRING(buffer), (size_t)PyString_GET_SIZE(buffer), options);
     Py_END_ALLOW_THREADS
     if (res == -1) {
+        PyObject *tmp = xattr_error_with_filename(path);
         Py_DECREF(buffer);
-        return xattr_error_with_filename(path);
+        PyMem_Free(path);
+        return tmp;
     }
+    PyMem_Free(path);
     if (res != (ssize_t)PyString_GET_SIZE(buffer)) {
         _PyString_Resize(&buffer, (int)res);
     }
