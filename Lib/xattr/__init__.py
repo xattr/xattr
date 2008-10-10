@@ -32,7 +32,7 @@ class xattr(object):
         be OR'ed with the options passed to getxattr, setxattr, etc.
         """
         self.obj = obj
-        self.options = 0
+        self.options = options
         self.flavor = None
         fileno = getattr(obj, 'fileno', None)
         if fileno is not None:
