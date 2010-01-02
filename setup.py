@@ -41,9 +41,8 @@ setup(
     license="MIT License",
     packages=['xattr'],
     platforms=['MacOS X', 'Linux', 'FreeBSD'],
-    package_dir={'xattr': 'Lib/xattr'},
     ext_modules=[
-        Extension("xattr._xattr", ["Modules/xattr/_xattr.c"]),
+        Extension("xattr._xattr", ["xattr/_xattr.c"]),
     ],
     entry_points={
         'console_scripts': [
