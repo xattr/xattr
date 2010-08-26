@@ -7,9 +7,21 @@ The xattr type wraps a path or file descriptor with a dict-like interface
 that exposes these extended attributes.
 """
 
-__version__ = '0.5'
-from constants import *
+__version__ = '0.6.1'
+from constants import XATTR_NOFOLLOW, XATTR_CREATE, XATTR_REPLACE, \
+    XATTR_NOSECURITY, XATTR_MAXNAMELEN, XATTR_FINDERINFO_NAME, \
+    XATTR_RESOURCEFORK_NAME
+
 import _xattr
+
+def _pyflakes_api():
+    # trick pyflakes into thinking these are used.
+    return [
+        XATTR_NOFOLLOW, XATTR_CREATE, XATTR_REPLACE,
+        XATTR_NOSECURITY, XATTR_MAXNAMELEN, XATTR_FINDERINFO_NAME,
+        XATTR_RESOURCEFORK_NAME,
+    ]
+ 
 
 def _boundfunc(func, first):
     def _func(*args):

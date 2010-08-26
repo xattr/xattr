@@ -848,6 +848,11 @@ py_listxattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , Py
         PyMem_Free(path);
         return NULL;
     }
+    /* avoid 2nd listxattr call if the first one returns 0 */
+    if (res == 0) {
+        PyMem_Free(path);
+        return buffer;
+    }
     Py_BEGIN_ALLOW_THREADS
     res = xattr_listxattr((const char *)path, (void *)PyString_AS_STRING(buffer), (size_t)PyString_GET_SIZE(buffer), options);
     Py_END_ALLOW_THREADS

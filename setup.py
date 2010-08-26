@@ -5,7 +5,7 @@ ez_setup.use_setuptools()
 
 from setuptools import setup, Extension
 
-VERSION = '0.5'
+VERSION = '0.6.1'
 DESCRIPTION = "Python wrapper for extended filesystem attributes"
 LONG_DESCRIPTION = """
 Extended attributes extend the basic attributes of files and directories
@@ -24,7 +24,7 @@ License :: OSI Approved :: MIT License
 Natural Language :: English
 Operating System :: MacOS :: MacOS X
 Operating System :: POSIX :: Linux
-Operating System :: POSIX :: FreeBSD
+Operating System :: POSIX :: BSD :: FreeBSD
 Programming Language :: Python
 Topic :: Software Development :: Libraries :: Python Modules
 """.splitlines()))
