@@ -37,10 +37,10 @@ setup(
     classifiers=CLASSIFIERS,
     author="Bob Ippolito",
     author_email="bob@redivi.com",
-    url="http://undefined.org/python/#xattr",
+    url="http://github.com/xattr/xattr",
     license="MIT License",
     packages=['xattr'],
-    platforms=['MacOS X', 'Linux', 'FreeBSD'],
+    platforms=['MacOS X', 'Linux', 'FreeBSD', 'Solaris'],
     ext_modules=[
         Extension("xattr._xattr", ["xattr/_xattr.c"]),
     ],
