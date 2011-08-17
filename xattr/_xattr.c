@@ -251,7 +251,6 @@ static ssize_t xattr_fgetxattr(int fd, const char *name, void *value,
 
     /* XXX should check that name does not have / characters in it */
     xfd = openat(fd, name, O_RDONLY | O_XATTR);
-    close(fd);
     if (xfd == -1) {
 	return -1;
     }
