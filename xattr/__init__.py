@@ -7,7 +7,7 @@ The xattr type wraps a path or file descriptor with a dict-like interface
 that exposes these extended attributes.
 """
 
-__version__ = '0.6.1'
+__version__ = '0.6.2'
 from constants import XATTR_NOFOLLOW, XATTR_CREATE, XATTR_REPLACE, \
     XATTR_NOSECURITY, XATTR_MAXNAMELEN, XATTR_FINDERINFO_NAME, \
     XATTR_RESOURCEFORK_NAME
@@ -21,7 +21,7 @@ def _pyflakes_api():
         XATTR_NOSECURITY, XATTR_MAXNAMELEN, XATTR_FINDERINFO_NAME,
         XATTR_RESOURCEFORK_NAME,
     ]
- 
+
 
 def _boundfunc(func, first):
     def _func(*args):
@@ -61,7 +61,7 @@ class xattr(object):
             return '<%s %s=%r>' % (type(self).__name__, self.flavor, self.obj)
         else:
             return object.__repr__(self)
-    
+
     def _bind_any(self, fmt, obj, options):
         options = self.options
         for method in ("get", "set", "remove", "list"):
@@ -78,7 +78,7 @@ class xattr(object):
         """
         Retrieve the extended attribute ``name`` as a ``str``.
         Raises ``IOError`` on failure.
-        
+
         See x-man-page://2/getxattr for options and possible errors.
         """
         return self._get(name, 0, 0, options | self.options)
@@ -87,7 +87,7 @@ class xattr(object):
         """
         Set the extended attribute ``name`` to ``value``
         Raises ``IOError`` on failure.
-        
+
         See x-man-page://2/setxattr for options and possible errors.
         """
         self._set(name, value, 0, options | self.options)
@@ -96,7 +96,7 @@ class xattr(object):
         """
         Remove the extended attribute ``name``
         Raises ``IOError`` on failure.
-        
+
         See x-man-page://2/removexattr for options and possible errors.
         """
         self._remove(name, options | self.options)
@@ -105,13 +105,13 @@ class xattr(object):
         """
         Retrieves the extended attributes currently set as a list
         of unicode strings.  Raises ``IOError`` on failure.
-        
+
         See x-man-page://2/listxattr for options and possible errors.
         """
         res = self._list(options | self.options).split('\x00')
         res.pop()
         return [unicode(s, 'utf-8') for s in res]
-   
+
     # dict-like methods
 
     def __len__(self):
@@ -122,7 +122,7 @@ class xattr(object):
             self.remove(item)
         except IOError:
             raise KeyError(item)
-    
+
     def __setitem__(self, item, value):
         self.set(item, value)
 
@@ -131,7 +131,7 @@ class xattr(object):
             return self.get(item)
         except IOError:
             raise KeyError(item)
-        
+
     def iterkeys(self):
         return iter(self.list())
 
@@ -156,7 +156,7 @@ class xattr(object):
             seq = dict(seq)
         for k, v in seq.iteritems():
             self[k] = v
-    
+
     def copy(self):
         return dict(self.iteritems())
 
@@ -166,7 +166,7 @@ class xattr(object):
         except IOError:
             self[k] = d
         return d
-    
+
     def keys(self):
         return self.list()
 
