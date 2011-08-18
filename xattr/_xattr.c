@@ -387,14 +387,19 @@ static ssize_t xattr_xflistxattr(int xfd, char *namebuf, size_t size, int option
     ssize_t nsize = 0;
 
     dirp = fdopendir(xfd);
+    if (dirp == NULL) {
+        return (-1);
+    }
     while (entry = readdir(dirp)) {
-	esize = strlen(entry->d_name);
-	if (nsize + esize + 1 < size) {
-	    strcat(namebuf + nsize, entry->d_name);
+        if (strcmp(entry->d_name, ".") == 0 ||
+                strcmp(entry->d_name, "..") == 0)
+            continue;
+	    esize = strlen(entry->d_name);
+	    if (nsize + esize + 1 <= size) {
+            snprintf((char *)(namebuf + nsize), esize + 1,
+                    entry->d_name);
+    	}
 	    nsize += esize + 1; /* +1 for \0 */
-	} else {
-	    break;
-	}
     }
     closedir(dirp);
     return nsize;
