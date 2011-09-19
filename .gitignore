@@ -1,0 +1,7 @@
+.AppleDouble/
+.pc/
+PKG-INFO
+debian/
+ez_setup/
+xattr.egg-info/
+build/

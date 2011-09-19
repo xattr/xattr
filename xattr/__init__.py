@@ -76,7 +76,7 @@ class xattr(object):
 
     def get(self, name, options=0):
         """
-        Retrieve the extended attribute ``name`` as a ``str``.
+        Retrieve the extended attribute ``name`` as a ``unicode`` string.
         Raises ``IOError`` on failure.
 
         See x-man-page://2/getxattr for options and possible errors.
@@ -85,7 +85,7 @@ class xattr(object):
 
     def set(self, name, value, options=0):
         """
-        Set the extended attribute ``name`` to ``value``
+        Set the extended attribute ``name`` to ``value`` encoded as utf-8
         Raises ``IOError`` on failure.
 
         See x-man-page://2/setxattr for options and possible errors.
