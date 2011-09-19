@@ -21,7 +21,7 @@
 
 
 /* Converts a freebsd format attribute list into a NULL terminated list.
- * While the man page on extattr_list_file says it is NULL terminated, 
+ * While the man page on extattr_list_file says it is NULL terminated,
  * it is actually the first byte that is the length of the
  * following attribute.
  */
@@ -37,10 +37,10 @@ static void convert_bsd_list(char *namebuf, size_t size)
 }
 
 static ssize_t xattr_getxattr(const char *path, const char *name,
-                              void *value, ssize_t size, u_int32_t position, 
+                              void *value, ssize_t size, u_int32_t position,
                               int options)
 {
-    if (position != 0 || 
+    if (position != 0 ||
         !(options == 0 || options == XATTR_XATTR_NOFOLLOW)) {
         return -1;
     }
@@ -73,7 +73,7 @@ static ssize_t xattr_setxattr(const char *path, const char *name,
         options == XATTR_XATTR_REPLACE) {
 
         /* meh. FreeBSD doesn't really have this in it's
-         * API... Oh well. 
+         * API... Oh well.
          */
     }
     else if (options != 0) {
@@ -179,7 +179,7 @@ static ssize_t xattr_fsetxattr(int fd, const char *name, void *value,
         return -1;
     }
     else {
-        rv = extattr_set_fd(fd, EXTATTR_NAMESPACE_USER, 
+        rv = extattr_set_fd(fd, EXTATTR_NAMESPACE_USER,
                             name, value, size);
     }
 
@@ -273,13 +273,13 @@ static ssize_t xattr_fgetxattr(int fd, const char *name, void *value,
 }
 
 static ssize_t xattr_getxattr(const char *path, const char *name,
-                              void *value, ssize_t size, u_int32_t position, 
+                              void *value, ssize_t size, u_int32_t position,
                               int options)
 {
     int fd;
     ssize_t bytes;
 
-    if (position != 0 || 
+    if (position != 0 ||
         !(options == 0 || options == XATTR_XATTR_NOFOLLOW)) {
         return -1;
     }
@@ -398,11 +398,11 @@ static ssize_t xattr_xflistxattr(int xfd, char *namebuf, size_t size, int option
     }
     closedir(dirp);
     return nsize;
-}    
+}
 static ssize_t xattr_flistxattr(int fd, char *namebuf, size_t size, int options)
 {
     int xfd;
-    
+
     xfd = openat(fd, ".", O_RDONLY);
     return xattr_xflistxattr(xfd, namebuf, size, options);
 }
@@ -587,7 +587,7 @@ py_getxattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , PyO
         Py_BEGIN_ALLOW_THREADS
         res = xattr_getxattr((const char *)path, (const char *)name, NULL, 0, position, options);
         Py_END_ALLOW_THREADS
-        if (res == -1) {    
+        if (res == -1) {
             PyObject *tmp = xattr_error_with_filename(path);
             PyMem_Free(path);
             PyMem_Free(name);
@@ -616,7 +616,9 @@ py_getxattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , PyO
     if (res != size) {
         _PyString_Resize(&buffer, (int)res);
     }
-    return buffer;
+    PyObject * unistr = PyString_AsDecodedObject(buffer, "utf-8", "replace");
+    Py_DECREF(buffer);
+    return unistr;
 }
 
 PyDoc_STRVAR(pydoc_fgetxattr,
@@ -648,7 +650,7 @@ py_fgetxattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , Py
         Py_BEGIN_ALLOW_THREADS
         res = xattr_fgetxattr(fd, (const char *)name, NULL, 0, position, options);
         Py_END_ALLOW_THREADS
-        if (res == -1) {    
+        if (res == -1) {
             PyMem_Free(name);
             return xattr_error();
         }
@@ -670,7 +672,9 @@ py_fgetxattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , Py
     if (res != size) {
         _PyString_Resize(&buffer, (int)res);
     }
-    return buffer;
+    PyObject * unistr = PyString_AsDecodedObject(buffer, "utf-8", "replace");
+    Py_DECREF(buffer);
+    return unistr;
 }
 
 PyDoc_STRVAR(pydoc_setxattr,
@@ -686,15 +690,15 @@ py_setxattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , PyO
     char *path;
     char *name;
     int options = 0;
-    char *value;
+    char *value = NULL;
     int size;
     u_int32_t position = 0;
     int res;
     if (!PyArg_ParseTuple(args, /* AndKeywords(args, kwds, */
-            "etets#|Ii:setxattr", /* keywords, */
+            "etetes#|Ii:setxattr", /* keywords, */
             Py_FileSystemDefaultEncoding, &path,
             Py_FileSystemDefaultEncoding, &name,
-            &value, &size,
+            "utf-8", &value, &size,
             &position,
             &options)) {
         return NULL;
@@ -710,6 +714,7 @@ py_setxattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , PyO
     }
     PyMem_Free(path);
     PyMem_Free(name);
+    PyMem_Free(value);
     return result;
 }
 
@@ -725,15 +730,15 @@ py_fsetxattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , Py
     int fd;
     char *name;
     int options = 0;
-    char *value;
+    char *value = NULL;
     int size;
     u_int32_t position = 0;
     int res;
     if (!PyArg_ParseTuple(args, /* AndKeywords(args, kwds, */
-            "iets#|Ii:fsetxattr", /* keywords, */
+            "ietes#|Ii:fsetxattr", /* keywords, */
             &fd,
             Py_FileSystemDefaultEncoding, &name,
-            &value, &size,
+            "utf-8", &value, &size,
             &position,
             &options)) {
         return NULL;
@@ -742,6 +747,7 @@ py_fsetxattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , Py
     res = xattr_fsetxattr(fd, (const char *)name, (void *)value, size, position, options);
     Py_END_ALLOW_THREADS
     PyMem_Free(name);
+    PyMem_Free(value);
     if (res) {
         return xattr_error();
     }
@@ -837,7 +843,7 @@ py_listxattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , Py
     Py_BEGIN_ALLOW_THREADS
     res = xattr_listxattr((const char *)path, NULL, 0, options);
     Py_END_ALLOW_THREADS
-    if (res == -1) {    
+    if (res == -1) {
         PyObject *tmp = xattr_error_with_filename(path);
         PyMem_Free(path);
         return tmp;
@@ -890,7 +896,7 @@ py_flistxattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , P
     Py_BEGIN_ALLOW_THREADS
     res = xattr_flistxattr(fd, NULL, 0, options);
     Py_END_ALLOW_THREADS
-    if (res == -1) {    
+    if (res == -1) {
         return xattr_error();
     }
     buffer = PyString_FromStringAndSize((char *)NULL, (int)res);
