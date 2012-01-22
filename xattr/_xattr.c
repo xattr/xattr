@@ -80,7 +80,7 @@ static ssize_t xattr_setxattr(const char *path, const char *name,
         return -1;
     }
 
-    if (options & XATTR_XATTR_NOFOLLOW) {
+    if (nofollow) {
         rv = extattr_set_link(path, EXTATTR_NAMESPACE_USER,
                                 name, value, size);
     }
@@ -175,7 +175,7 @@ static ssize_t xattr_fsetxattr(int fd, const char *name, void *value,
         return -1;
     }
 
-    if (options & XATTR_XATTR_NOFOLLOW) {
+    if (nofollow) {
         return -1;
     }
     else {
@@ -447,7 +447,7 @@ static ssize_t xattr_setxattr(const char *path, const char *name, void *value, s
     } else if (options != 0) {
         return -1;
     }
-    if (options & XATTR_XATTR_NOFOLLOW) {
+    if (nofollow) {
         return lsetxattr(path, name, value, size, options);
     } else {
         return setxattr(path, name, value, size, options);
