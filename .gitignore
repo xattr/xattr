@@ -1,0 +1,6 @@
+/xattr.egg-info
+/build
+/dist
+*.pyc
+*.so
+.\#*
