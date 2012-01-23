@@ -17,21 +17,21 @@ class TestFile(TestCase):
         self.assertEqual(x.keys(), [])
         self.assertEqual(dict(x), {})
 
-        x['sopal'] = 'foo'
-        x['sop.foo'] = 'bar'
+        x['user.sopal'] = 'foo'
+        x['user.sop.foo'] = 'bar'
         del x
 
         x = xattr.xattr(self.tempfile)
-        self.assertTrue('sopal' in x)
-        self.assertEqual(x['sopal'], 'foo')
-        self.assertTrue('sop.foo' in x)
-        self.assertEqual(x['sop.foo'], 'bar')
+        self.assertTrue('user.sopal' in x)
+        self.assertEqual(x['user.sopal'], 'foo')
+        self.assertTrue('user.sop.foo' in x)
+        self.assertEqual(x['user.sop.foo'], 'bar')
 
-        del x['sop.foo']
+        del x['user.sop.foo']
         del x
         
         x = xattr.xattr(self.tempfile)
-        self.assertTrue('sop.foo' not in x)
+        self.assertTrue('user.sop.foo' not in x)
 
 
 class TestDir(TestFile):
