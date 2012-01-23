@@ -5,7 +5,7 @@ ez_setup.use_setuptools()
 
 from setuptools import setup, Extension
 
-VERSION = '0.6.2'
+VERSION = '0.6.3'
 DESCRIPTION = "Python wrapper for extended filesystem attributes"
 LONG_DESCRIPTION = """
 Extended attributes extend the basic attributes of files and directories
