@@ -1,7 +1,6 @@
 import os
 from unittest import TestCase
 from tempfile import mkdtemp, NamedTemporaryFile
-from os import tempnam
 
 import xattr
 
@@ -30,12 +29,12 @@ class TestFile(TestCase):
 
         del x['user.sop.foo']
         del x
-        
+
         x = xattr.xattr(self.tempfile)
         self.assertTrue('user.sop.foo' not in x)
 
     def testSymlinkAttrs(self):
-        symlinkPath = tempnam()
+        symlinkPath = self.tempfilename + '.link'
         os.symlink(self.tempfilename, symlinkPath)
         try:
             symlink = xattr.xattr(symlinkPath, options=xattr.XATTR_NOFOLLOW)
@@ -50,6 +49,6 @@ class TestDir(TestFile):
     def setUp(self):
         self.tempfile = mkdtemp()
         self.tempfilename = self.tempfile
-    
+
     def tearDown(self):
         os.rmdir(self.tempfile)
