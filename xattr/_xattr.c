@@ -1,7 +1,7 @@
 #include "Python.h"
 #ifdef __FreeBSD__
 #include <sys/extattr.h>
-#elif defined(__SUN__) || defined(__sun__)
+#elif defined(__SUN__) || defined(__sun__) || defined(sun)
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -232,7 +232,7 @@ static ssize_t xattr_flistxattr(int fd, char *namebuf, size_t size, int options)
     return rv;
 }
 
-#elif defined(__SUN__) || defined(__sun__)
+#elif defined(__SUN__) || defined(__sun__) || define(sun)
 
 /* Solaris 9 and later compatibility API */
 #define XATTR_XATTR_NOFOLLOW 0x0001
@@ -240,7 +240,9 @@ static ssize_t xattr_flistxattr(int fd, char *namebuf, size_t size, int options)
 #define XATTR_XATTR_REPLACE 0x0004
 #define XATTR_XATTR_NOSECURITY 0x0008
 
-#define u_int32_t unsigned int
+#ifndef u_int32_t
+#define u_int32_t uint32_t
+#endif
 
 static ssize_t xattr_fgetxattr(int fd, const char *name, void *value,
                                ssize_t size, u_int32_t position, int options)
