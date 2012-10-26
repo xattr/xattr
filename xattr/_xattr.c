@@ -232,7 +232,7 @@ static ssize_t xattr_flistxattr(int fd, char *namebuf, size_t size, int options)
     return rv;
 }
 
-#elif defined(__SUN__) || defined(__sun__) || define(sun)
+#elif defined(__SUN__) || defined(__sun__) || defined(sun)
 
 /* Solaris 9 and later compatibility API */
 #define XATTR_XATTR_NOFOLLOW 0x0001
