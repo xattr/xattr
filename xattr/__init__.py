@@ -9,11 +9,10 @@ that exposes these extended attributes.
 
 __version__ = '0.6.4'
 
-from .constants import (XATTR_NOFOLLOW, XATTR_CREATE, XATTR_REPLACE,
+from .lib import (XATTR_NOFOLLOW, XATTR_CREATE, XATTR_REPLACE,
     XATTR_NOSECURITY, XATTR_MAXNAMELEN, XATTR_FINDERINFO_NAME,
-    XATTR_RESOURCEFORK_NAME)
-
-import _xattr
+    XATTR_RESOURCEFORK_NAME, _getxattr, _fgetxattr, _setxattr, _fsetxattr,
+    _removexattr, _fremovexattr, _listxattr, _flistxattr)
 
 
 __all__ = [
@@ -66,7 +65,7 @@ class xattr(object):
 
         See x-man-page://2/getxattr for options and possible errors.
         """
-        return self._call(_xattr.getxattr, _xattr.fgetxattr, name, 0, 0, options | self.options)
+        return self._call(_getxattr, _fgetxattr, name, 0, 0, options | self.options)
 
     def set(self, name, value, options=0):
         """
@@ -75,7 +74,7 @@ class xattr(object):
 
         See x-man-page://2/setxattr for options and possible errors.
         """
-        return self._call(_xattr.setxattr, _xattr.fsetxattr, name, value, 0, options | self.options)
+        return self._call(_setxattr, _fsetxattr, name, value, 0, options | self.options)
 
     def remove(self, name, options=0):
         """
@@ -84,7 +83,7 @@ class xattr(object):
 
         See x-man-page://2/removexattr for options and possible errors.
         """
-        return self._call(_xattr.removexattr, _xattr.fremovexattr, name, options | self.options)
+        return self._call(_removexattr, _fremovexattr, name, options | self.options)
         self._remove(name, options | self.options)
 
     def list(self, options=0):
@@ -94,7 +93,7 @@ class xattr(object):
 
         See x-man-page://2/listxattr for options and possible errors.
         """
-        res = self._call(_xattr.listxattr, _xattr.flistxattr, options | self.options).split('\x00')
+        res = self._call(_listxattr, _flistxattr, options | self.options).split('\x00')
         res.pop()
         return [unicode(s, 'utf-8') for s in res]
 

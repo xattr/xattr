@@ -4,15 +4,9 @@ from tempfile import mkdtemp, NamedTemporaryFile
 
 import xattr
 
-class TestFile(TestCase):
-    def setUp(self):
-        self.tempfile = NamedTemporaryFile()
-        self.tempfilename = self.tempfile.name
 
-    def tearDown(self):
-        self.tempfile.close()
-
-    def testAttr(self):
+class BaseTestXattr(object):
+    def test_attr(self):
         x = xattr.xattr(self.tempfile)
         self.assertEqual(x.keys(), [])
         self.assertEqual(dict(x), {})
@@ -33,7 +27,7 @@ class TestFile(TestCase):
         x = xattr.xattr(self.tempfile)
         self.assertTrue('user.sop.foo' not in x)
 
-    def testSymlinkAttrs(self):
+    def test_symlink_attrs(self):
         symlinkPath = self.tempfilename + '.link'
         os.symlink(self.tempfilename, symlinkPath)
         try:
@@ -45,7 +39,17 @@ class TestFile(TestCase):
         finally:
             os.remove(symlinkPath)
 
-class TestDir(TestFile):
+
+class TestFile(TestCase, BaseTestXattr):
+    def setUp(self):
+        self.tempfile = NamedTemporaryFile()
+        self.tempfilename = self.tempfile.name
+
+    def tearDown(self):
+        self.tempfile.close()
+
+
+class TestDir(TestCase, BaseTestXattr):
     def setUp(self):
         self.tempfile = mkdtemp()
         self.tempfilename = self.tempfile
