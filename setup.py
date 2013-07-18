@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-import ez_setup
-ez_setup.use_setuptools()
+from setuptools import setup
 
-from setuptools import setup, Extension
+from xattr import lib
+
 
 VERSION = '0.6.4'
 DESCRIPTION = "Python wrapper for extended filesystem attributes"
@@ -16,7 +16,7 @@ Extended attributes are currently only available on Darwin 8.0+ (Mac OS X 10.4)
 and Linux 2.6+. Experimental support is included for Solaris and FreeBSD.
 """
 
-CLASSIFIERS = filter(None, map(str.strip,
+CLASSIFIERS = filter(bool, map(str.strip,
 """
 Environment :: Console
 Intended Audience :: Developers
@@ -42,7 +42,7 @@ setup(
     packages=['xattr'],
     platforms=['MacOS X', 'Linux', 'FreeBSD', 'Solaris'],
     ext_modules=[
-        Extension("xattr._xattr", ["xattr/_xattr.c"]),
+        lib.ffi.verifier.get_extension()
     ],
     entry_points={
         'console_scripts': [
