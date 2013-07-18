@@ -47,10 +47,11 @@ class xattr(object):
             self.value = obj
 
     def __repr__(self):
-        if self.flavor:
-            return '<%s %s=%r>' % (type(self).__name__, self.flavor, self.obj)
+        if isinstance(self.value, int):
+            flavor = "fd"
         else:
-            return object.__repr__(self)
+            flavor = "file"
+        return "<%s %s=%r>" % (type(self).__name__, flavor, self.value)
 
     def _call(self, name_func, fd_func, *args):
         if isinstance(self.value, int):
