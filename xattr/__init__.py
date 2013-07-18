@@ -8,25 +8,20 @@ that exposes these extended attributes.
 """
 
 __version__ = '0.6.4'
-from constants import XATTR_NOFOLLOW, XATTR_CREATE, XATTR_REPLACE, \
-    XATTR_NOSECURITY, XATTR_MAXNAMELEN, XATTR_FINDERINFO_NAME, \
-    XATTR_RESOURCEFORK_NAME
+
+from .constants import (XATTR_NOFOLLOW, XATTR_CREATE, XATTR_REPLACE,
+    XATTR_NOSECURITY, XATTR_MAXNAMELEN, XATTR_FINDERINFO_NAME,
+    XATTR_RESOURCEFORK_NAME)
 
 import _xattr
 
-def _pyflakes_api():
-    # trick pyflakes into thinking these are used.
-    return [
-        XATTR_NOFOLLOW, XATTR_CREATE, XATTR_REPLACE,
-        XATTR_NOSECURITY, XATTR_MAXNAMELEN, XATTR_FINDERINFO_NAME,
-        XATTR_RESOURCEFORK_NAME,
-    ]
 
+__all__ = [
+    "XATTR_NOFOLLOW", "XATTR_CREATE", "XATTR_REPLACE", "XATTR_NOSECURITY",
+    "XATTR_MAXNAMELEN", "XATTR_FINDERINFO_NAME", "XATTR_RESOURCEFORK_NAME",
+    "xattr", "listxattr", "getxattr", "setxattr", "removexattr"
+]
 
-def _boundfunc(func, first):
-    def _func(*args):
-        return func(first, *args)
-    return _func
 
 class xattr(object):
     """
@@ -45,16 +40,11 @@ class xattr(object):
         """
         self.obj = obj
         self.options = options
-        self.flavor = None
         fileno = getattr(obj, 'fileno', None)
         if fileno is not None:
-            obj = fileno()
-        if isinstance(obj, int):
-            self.flavor = 'fd'
-            self._bind_any('f%sxattr', obj, options)
+            self.value = fileno()
         else:
-            self.flavor = 'file'
-            self._bind_any('%sxattr', obj, options)
+            self.value = obj
 
     def __repr__(self):
         if self.flavor:
@@ -62,17 +52,11 @@ class xattr(object):
         else:
             return object.__repr__(self)
 
-    def _bind_any(self, fmt, obj, options):
-        options = self.options
-        for method in ("get", "set", "remove", "list"):
-            name = '_' + method
-            func = getattr(_xattr, fmt % (method,))
-            meth = _boundfunc(func, obj)
-            try:
-                meth.__name__ = name
-            except TypeError:
-                pass
-            setattr(self, name, meth)
+    def _call(self, name_func, fd_func, *args):
+        if isinstance(self.value, int):
+            return fd_func(self.value, *args)
+        else:
+            return name_func(self.value, *args)
 
     def get(self, name, options=0):
         """
@@ -81,7 +65,7 @@ class xattr(object):
 
         See x-man-page://2/getxattr for options and possible errors.
         """
-        return self._get(name, 0, 0, options | self.options)
+        return self._call(_xattr.getxattr, _xattr.fgetxattr, name, 0, 0, options | self.options)
 
     def set(self, name, value, options=0):
         """
@@ -90,7 +74,7 @@ class xattr(object):
 
         See x-man-page://2/setxattr for options and possible errors.
         """
-        self._set(name, value, 0, options | self.options)
+        return self._call(_xattr.setxattr, _xattr.fsetxattr, name, value, 0, options | self.options)
 
     def remove(self, name, options=0):
         """
@@ -99,6 +83,7 @@ class xattr(object):
 
         See x-man-page://2/removexattr for options and possible errors.
         """
+        return self._call(_xattr.removexattr, _xattr.fremovexattr, name, options | self.options)
         self._remove(name, options | self.options)
 
     def list(self, options=0):
@@ -108,7 +93,7 @@ class xattr(object):
 
         See x-man-page://2/listxattr for options and possible errors.
         """
-        res = self._list(options | self.options).split('\x00')
+        res = self._call(_xattr.listxattr, _xattr.flistxattr, options | self.options).split('\x00')
         res.pop()
         return [unicode(s, 'utf-8') for s in res]
 
@@ -186,20 +171,19 @@ class xattr(object):
 
 
 def listxattr(f, symlink=False):
-    __doc__ = xattr.list.__doc__
     return tuple(xattr(f).list(options=symlink and XATTR_NOFOLLOW or 0))
 
+
 def getxattr(f, attr, symlink=False):
-    __doc__ = xattr.get.__doc__
     return xattr(f).get(attr, options=symlink and XATTR_NOFOLLOW or 0)
 
+
 def setxattr(f, attr, value, options=0, symlink=False):
-    __doc__ = xattr.set.__doc__
     if symlink:
         options |= XATTR_NOFOLLOW
     return xattr(f).set(attr, value, options=options)
 
+
 def removexattr(f, attr, symlink=False):
-    __doc__ = xattr.remove.__doc__
     options = symlink and XATTR_NOFOLLOW or 0
     return xattr(f).remove(attr, options=options)
