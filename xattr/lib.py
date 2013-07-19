@@ -10,8 +10,6 @@ ffi.cdef("""
 #define XATTR_REPLACE ...
 #define XATTR_NOSECURITY ...
 #define XATTR_MAXNAMELEN ...
-#define XATTR_FINDERINFO_NAME ...
-#define XATTR_RESOURCEFORK_NAME ...
 
 ssize_t xattr_getxattr(const char *, const char *, void *, ssize_t, uint32_t, int);
 ssize_t xattr_fgetxattr(int, const char *, void *, ssize_t, uint32_t, int);
@@ -586,8 +584,9 @@ XATTR_CREATE = lib.XATTR_CREATE
 XATTR_REPLACE = lib.XATTR_REPLACE
 XATTR_NOSECURITY = lib.XATTR_NOSECURITY
 XATTR_MAXNAMELEN = lib.XATTR_MAXNAMELEN
-XATTR_FINDERINFO_NAME = lib.XATTR_FINDERINFO_NAME
-XATTR_RESOURCEFORK_NAME = lib.XATTR_RESOURCEFORK_NAME
+
+XATTR_FINDERINFO_NAME = "com.apple.FinderInfo"
+XATTR_RESOURCEFORK_NAME = "com.apple.ResourceFork"
 
 
 def fs_encode(val):
