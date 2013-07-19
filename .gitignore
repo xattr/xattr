@@ -1,6 +1,8 @@
 /xattr.egg-info
 /build
 /dist
+/*.egg
 *.pyc
 *.so
 .\#*
+__pycache__
