@@ -577,7 +577,7 @@ static ssize_t xattr_flistxattr(int fd, char *namebuf, size_t size, int options)
 #define xattr_listxattr listxattr
 #define xattr_flistxattr flistxattr
 #endif
-""")
+""", ext_package='xattr')
 
 XATTR_NOFOLLOW = lib.XATTR_NOFOLLOW
 XATTR_CREATE = lib.XATTR_CREATE

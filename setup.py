@@ -4,22 +4,20 @@ import os
 import sys
 
 from setuptools import setup
+from distutils.command.build import build
 
-# HACK for setup.py build, this way it can find cffi and thus make the
-# extension
-for path in os.listdir("."):
-    if path.endswith(".egg"):
-        sys.path.append(path)
+class cffi_build(build):
+    """This is a shameful hack to ensure that cffi is present when
+    we specify ext_modules. We can't do this eagerly because
+    setup_requires hasn't run yet.
+    """
+    def finalize_options(self):
+        from xattr.lib import ffi
+        self.distribution.ext_modules = [ffi.verifier.get_extension()]
+        self.distribution.ext_modules.append(ext)
+        build.finalize_options(self)
 
-try:
-    from xattr import lib
-except ImportError:
-    ext_modules = []
-else:
-    ext_modules = [lib.ffi.verifier.get_extension()]
-
-
-VERSION = '0.6.4'
+VERSION = '0.7.0'
 DESCRIPTION = "Python wrapper for extended filesystem attributes"
 LONG_DESCRIPTION = """
 Extended attributes extend the basic attributes of files and directories
@@ -54,15 +52,16 @@ setup(
     url="http://github.com/xattr/xattr",
     license="MIT License",
     packages=['xattr'],
+    ext_package='xattr',
     platforms=['MacOS X', 'Linux', 'FreeBSD', 'Solaris'],
-    ext_modules=ext_modules,
     entry_points={
         'console_scripts': [
             "xattr = xattr.tool:main",
         ],
     },
-    install_requires=["cffi"],
-    setup_requires=["cffi"],
+    install_requires=["cffi>=0.4"],
+    setup_requires=["cffi>=0.4"],
     test_suite="xattr.tests.all_tests_suite",
     zip_safe=False,
+    cmdclass={'build': cffi_build},
 )
