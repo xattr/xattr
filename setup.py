@@ -14,7 +14,6 @@ class cffi_build(build):
     def finalize_options(self):
         from xattr.lib import ffi
         self.distribution.ext_modules = [ffi.verifier.get_extension()]
-        self.distribution.ext_modules.append(ext)
         build.finalize_options(self)
 
 VERSION = '0.7.0'
