@@ -1,3 +1,31 @@
+import os
+import sys
+
+import cffi
+
+ffi = cffi.FFI()
+ffi.cdef("""
+#define XATTR_NOFOLLOW ...
+#define XATTR_CREATE ...
+#define XATTR_REPLACE ...
+#define XATTR_NOSECURITY ...
+#define XATTR_MAXNAMELEN ...
+
+ssize_t xattr_getxattr(const char *, const char *, void *, ssize_t, uint32_t, int);
+ssize_t xattr_fgetxattr(int, const char *, void *, ssize_t, uint32_t, int);
+
+ssize_t xattr_setxattr(const char *, const char *, void *, ssize_t, uint32_t, int);
+ssize_t xattr_fsetxattr(int, const char *, void *, ssize_t, uint32_t, int);
+
+ssize_t xattr_removexattr(const char *, const char *, int);
+ssize_t xattr_fremovexattr(int, const char *, int);
+
+ssize_t xattr_listxattr(const char *, char *, size_t, int);
+ssize_t xattr_flistxattr(int, char *, size_t, int);
+
+""")
+
+lib = ffi.verify("""
 #include "Python.h"
 #ifdef __FreeBSD__
 #include <sys/extattr.h>
@@ -21,7 +49,7 @@
 
 
 /* Converts a freebsd format attribute list into a NULL terminated list.
- * While the man page on extattr_list_file says it is NULL terminated, 
+ * While the man page on extattr_list_file says it is NULL terminated,
  * it is actually the first byte that is the length of the
  * following attribute.
  */
@@ -37,10 +65,10 @@ static void convert_bsd_list(char *namebuf, size_t size)
 }
 
 static ssize_t xattr_getxattr(const char *path, const char *name,
-                              void *value, ssize_t size, u_int32_t position, 
+                              void *value, ssize_t size, u_int32_t position,
                               int options)
 {
-    if (position != 0 || 
+    if (position != 0 ||
         !(options == 0 || options == XATTR_XATTR_NOFOLLOW)) {
         return -1;
     }
@@ -73,7 +101,7 @@ static ssize_t xattr_setxattr(const char *path, const char *name,
         options == XATTR_XATTR_REPLACE) {
 
         /* meh. FreeBSD doesn't really have this in it's
-         * API... Oh well. 
+         * API... Oh well.
          */
     }
     else if (options != 0) {
@@ -179,7 +207,7 @@ static ssize_t xattr_fsetxattr(int fd, const char *name, void *value,
         return -1;
     }
     else {
-        rv = extattr_set_fd(fd, EXTATTR_NAMESPACE_USER, 
+        rv = extattr_set_fd(fd, EXTATTR_NAMESPACE_USER,
                             name, value, size);
     }
 
@@ -254,19 +282,19 @@ static ssize_t xattr_fgetxattr(int fd, const char *name, void *value,
     /* XXX should check that name does not have / characters in it */
     xfd = openat(fd, name, O_RDONLY | O_XATTR);
     if (xfd == -1) {
-	return -1;
+    return -1;
     }
     if (lseek(xfd, position, SEEK_SET) == -1) {
-	close(xfd);
-	return -1;
+    close(xfd);
+    return -1;
     }
     if (value == NULL) {
         if (fstat(xfd, &statbuf) == -1) {
-	    close(xfd);
-	    return -1;
+        close(xfd);
+        return -1;
         }
-	close(xfd);
-	return statbuf.st_size;
+    close(xfd);
+    return statbuf.st_size;
     }
     /* XXX should keep reading until the buffer is exhausted or EOF */
     bytes = read(xfd, value, size);
@@ -275,22 +303,22 @@ static ssize_t xattr_fgetxattr(int fd, const char *name, void *value,
 }
 
 static ssize_t xattr_getxattr(const char *path, const char *name,
-                              void *value, ssize_t size, u_int32_t position, 
+                              void *value, ssize_t size, u_int32_t position,
                               int options)
 {
     int fd;
     ssize_t bytes;
 
-    if (position != 0 || 
+    if (position != 0 ||
         !(options == 0 || options == XATTR_XATTR_NOFOLLOW)) {
         return -1;
     }
 
     fd = open(path,
-	      O_RDONLY |
-	      ((options & XATTR_XATTR_NOFOLLOW) ? O_NOFOLLOW : 0));
+          O_RDONLY |
+          ((options & XATTR_XATTR_NOFOLLOW) ? O_NOFOLLOW : 0));
     if (fd == -1) {
-	return -1;
+    return -1;
     }
     bytes = xattr_fgetxattr(fd, name, value, size, position, options);
     close(fd);
@@ -305,21 +333,21 @@ static ssize_t xattr_fsetxattr(int fd, const char *name, void *value,
 
     /* XXX should check that name does not have / characters in it */
     xfd = openat(fd, name, O_XATTR | O_TRUNC |
-		 ((options & XATTR_XATTR_CREATE) ? O_EXCL : 0) |
-		 ((options & XATTR_XATTR_NOFOLLOW) ? O_NOFOLLOW : 0) |
-		 ((options & XATTR_XATTR_REPLACE) ? O_RDWR : O_WRONLY|O_CREAT),
-		 0644);
+         ((options & XATTR_XATTR_CREATE) ? O_EXCL : 0) |
+         ((options & XATTR_XATTR_NOFOLLOW) ? O_NOFOLLOW : 0) |
+         ((options & XATTR_XATTR_REPLACE) ? O_RDWR : O_WRONLY|O_CREAT),
+         0644);
     if (xfd == -1) {
-	return -1;
+    return -1;
     }
     while (size > 0) {
-	bytes = write(xfd, value, size);
-	if (bytes == -1) {
-	    close(xfd);
-	    return -1;
-	}
-	size -= bytes;
-	value += bytes;
+    bytes = write(xfd, value, size);
+    if (bytes == -1) {
+        close(xfd);
+        return -1;
+    }
+    size -= bytes;
+    value += bytes;
     }
     close(xfd);
     return 0;
@@ -337,9 +365,9 @@ static ssize_t xattr_setxattr(const char *path, const char *name,
     }
 
     fd = open(path,
-	      O_RDONLY | (options & XATTR_XATTR_NOFOLLOW) ? O_NOFOLLOW : 0);
+          O_RDONLY | (options & XATTR_XATTR_NOFOLLOW) ? O_NOFOLLOW : 0);
     if (fd == -1) {
-	return -1;
+    return -1;
     }
     bytes = xattr_fsetxattr(fd, name, value, size, position, options);
     close(fd);
@@ -358,7 +386,7 @@ static ssize_t xattr_fremovexattr(int fd, const char *name, int options)
     }
     xfd = openat(fd, ".", O_XATTR, 0644);
     if (xfd == -1) {
-	return -1;
+    return -1;
     }
     status = unlinkat(xfd, name, 0);
     close(xfd);
@@ -372,9 +400,9 @@ static ssize_t xattr_removexattr(const char *path, const char *name,
     ssize_t status;
 
     fd = open(path,
-	      O_RDONLY | ((options & XATTR_XATTR_NOFOLLOW) ? O_NOFOLLOW : 0));
+          O_RDONLY | ((options & XATTR_XATTR_NOFOLLOW) ? O_NOFOLLOW : 0));
     if (fd == -1) {
-	return -1;
+    return -1;
     }
     status =  xattr_fremovexattr(fd, name, options);
     close(fd);
@@ -396,20 +424,20 @@ static ssize_t xattr_xflistxattr(int xfd, char *namebuf, size_t size, int option
         if (strcmp(entry->d_name, ".") == 0 ||
                 strcmp(entry->d_name, "..") == 0)
             continue;
-	    esize = strlen(entry->d_name);
-	    if (nsize + esize + 1 <= size) {
+        esize = strlen(entry->d_name);
+        if (nsize + esize + 1 <= size) {
             snprintf((char *)(namebuf + nsize), esize + 1,
                     entry->d_name);
-    	}
-	    nsize += esize + 1; /* +1 for \0 */
+        }
+        nsize += esize + 1; /* +1 for \0 */
     }
     closedir(dirp);
     return nsize;
-}    
+}
 static ssize_t xattr_flistxattr(int fd, char *namebuf, size_t size, int options)
 {
     int xfd;
-    
+
     xfd = openat(fd, ".", O_RDONLY);
     return xattr_xflistxattr(xfd, namebuf, size, options);
 }
@@ -549,400 +577,137 @@ static ssize_t xattr_flistxattr(int fd, char *namebuf, size_t size, int options)
 #define xattr_listxattr listxattr
 #define xattr_flistxattr flistxattr
 #endif
+""")
 
-static PyObject *xattr_error(void);
-static PyObject *xattr_error_with_filename(char *name);
+XATTR_NOFOLLOW = lib.XATTR_NOFOLLOW
+XATTR_CREATE = lib.XATTR_CREATE
+XATTR_REPLACE = lib.XATTR_REPLACE
+XATTR_NOSECURITY = lib.XATTR_NOSECURITY
+XATTR_MAXNAMELEN = lib.XATTR_MAXNAMELEN
 
-static PyObject *
-xattr_error(void)
-{
-    return PyErr_SetFromErrno(PyExc_IOError);
-}
-
-static PyObject *
-xattr_error_with_filename(char *name)
-{
-    return PyErr_SetFromErrnoWithFilename(PyExc_IOError, name);
-}
-
-PyDoc_STRVAR(pydoc_getxattr,
-    "getxattr(path, name, size=0, position=0, options=0) -> str\n"
-    "\n"
-    "..."
-);
-static PyObject*
-py_getxattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , PyObject *kwds) */
-{
-    /* static char *keywords[] = { "path", "name", "size", "position", "options", NULL }; */
-    char *path;
-    char *name;
-    PyObject *buffer;
-    int options = 0;
-    size_t size = 0;
-    u_int32_t position = 0;
-    ssize_t res;
-    if (!PyArg_ParseTuple(args, /* AndKeywords(args, kwds, */
-            "etet|IIi:getxattr", /* keywords, */
-            Py_FileSystemDefaultEncoding, &path,
-            Py_FileSystemDefaultEncoding, &name,
-            &size,
-            &position,
-            &options)) {
-        return NULL;
-    }
-    if (size == 0) {
-        Py_BEGIN_ALLOW_THREADS
-        res = xattr_getxattr((const char *)path, (const char *)name, NULL, 0, position, options);
-        Py_END_ALLOW_THREADS
-        if (res == -1) {    
-            PyObject *tmp = xattr_error_with_filename(path);
-            PyMem_Free(path);
-            PyMem_Free(name);
-            return tmp;
-        }
-        size = res;
-    }
-    buffer = PyString_FromStringAndSize((char *)NULL, size);
-    if (buffer == NULL) {
-        PyMem_Free(path);
-        PyMem_Free(name);
-        return NULL;
-    }
-    Py_BEGIN_ALLOW_THREADS
-    res = xattr_getxattr((const char *)path, (const char *)name, (void *)PyString_AS_STRING(buffer), size, position, options);
-    Py_END_ALLOW_THREADS
-    if (res == -1) {
-        PyObject *tmp = xattr_error_with_filename(path);
-        Py_DECREF(buffer);
-        PyMem_Free(path);
-        PyMem_Free(name);
-        return tmp;
-    }
-    PyMem_Free(path);
-    PyMem_Free(name);
-    if (res != size) {
-        _PyString_Resize(&buffer, (int)res);
-    }
-    return buffer;
-}
-
-PyDoc_STRVAR(pydoc_fgetxattr,
-    "fgetxattr(fd, name, size=0, position=0, options=0) -> str\n"
-    "\n"
-    "..."
-);
-static PyObject*
-py_fgetxattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , PyObject *kwds) */
-{
-    /* static char *keywords[] = { "fd", "name", "size", "position", "options", NULL }; */
-    int fd;
-    char *name;
-    PyObject *buffer;
-    int options = 0;
-    size_t size = 0;
-    u_int32_t position = 0;
-    ssize_t res;
-    if (!PyArg_ParseTuple(args, /* AndKeywords(args, kwds, */
-            "iet|IIi:fgetxattr", /* keywords, */
-            &fd,
-            Py_FileSystemDefaultEncoding, &name,
-            &size,
-            &position,
-            &options)) {
-        return NULL;
-    }
-    if (size == 0) {
-        Py_BEGIN_ALLOW_THREADS
-        res = xattr_fgetxattr(fd, (const char *)name, NULL, 0, position, options);
-        Py_END_ALLOW_THREADS
-        if (res == -1) {    
-            PyMem_Free(name);
-            return xattr_error();
-        }
-        size = res;
-    }
-    buffer = PyString_FromStringAndSize((char *)NULL, size);
-    if (buffer == NULL) {
-        PyMem_Free(name);
-        return NULL;
-    }
-    Py_BEGIN_ALLOW_THREADS
-    res = xattr_fgetxattr(fd, (const char *)name, (void *)PyString_AS_STRING(buffer), size, position, options);
-    Py_END_ALLOW_THREADS
-    PyMem_Free(name);
-    if (res == -1) {
-        Py_DECREF(buffer);
-        return xattr_error();
-    }
-    if (res != size) {
-        _PyString_Resize(&buffer, (int)res);
-    }
-    return buffer;
-}
-
-PyDoc_STRVAR(pydoc_setxattr,
-    "setxattr(path, name, value, position=0, options=0) -> None\n"
-    "\n"
-    "..."
-);
-static PyObject*
-py_setxattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , PyObject *kwds) */
-{
-    /* static char *keywords[] = { "path", "name", "value", "position", "options", NULL }; */
-    PyObject *result;
-    char *path;
-    char *name;
-    int options = 0;
-    char *value;
-    int size;
-    u_int32_t position = 0;
-    int res;
-    if (!PyArg_ParseTuple(args, /* AndKeywords(args, kwds, */
-            "etets#|Ii:setxattr", /* keywords, */
-            Py_FileSystemDefaultEncoding, &path,
-            Py_FileSystemDefaultEncoding, &name,
-            &value, &size,
-            &position,
-            &options)) {
-        return NULL;
-    }
-    Py_BEGIN_ALLOW_THREADS
-    res = xattr_setxattr((const char *)path, (const char *)name, (void *)value, size, position, options);
-    Py_END_ALLOW_THREADS
-    if (res) {
-        result = xattr_error_with_filename(path);
-    } else {
-        Py_INCREF(Py_None);
-        result = Py_None;
-    }
-    PyMem_Free(path);
-    PyMem_Free(name);
-    return result;
-}
-
-PyDoc_STRVAR(pydoc_fsetxattr,
-    "fsetxattr(fd, name, value, position=0, options=0) -> None\n"
-    "\n"
-    "..."
-);
-static PyObject*
-py_fsetxattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , PyObject *kwds) */
-{
-    /* static char *keywords[] = { "fd", "name", "value", "position", "options", NULL }; */
-    int fd;
-    char *name;
-    int options = 0;
-    char *value;
-    int size;
-    u_int32_t position = 0;
-    int res;
-    if (!PyArg_ParseTuple(args, /* AndKeywords(args, kwds, */
-            "iets#|Ii:fsetxattr", /* keywords, */
-            &fd,
-            Py_FileSystemDefaultEncoding, &name,
-            &value, &size,
-            &position,
-            &options)) {
-        return NULL;
-    }
-    Py_BEGIN_ALLOW_THREADS
-    res = xattr_fsetxattr(fd, (const char *)name, (void *)value, size, position, options);
-    Py_END_ALLOW_THREADS
-    PyMem_Free(name);
-    if (res) {
-        return xattr_error();
-    }
-    Py_INCREF(Py_None);
-    return Py_None;
-}
-
-PyDoc_STRVAR(pydoc_removexattr,
-    "removexattr(path, name, options=0) -> None\n"
-    "\n"
-    "..."
-);
-static PyObject*
-py_removexattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , PyObject *kwds) */
-{
-    /* static char *keywords[] = { "path", "name", "options", NULL }; */
-    char *path;
-    char *name;
-    int options = 0;
-    int res;
-    PyObject *result;
-    if (!PyArg_ParseTuple(args, /* AndKeywords(args, kwds, */
-            "etet|i:removexattr", /* keywords, */
-            Py_FileSystemDefaultEncoding, &path,
-            Py_FileSystemDefaultEncoding, &name,
-            &options)) {
-        return NULL;
-    }
-    Py_BEGIN_ALLOW_THREADS
-    res = xattr_removexattr((const char *)path, (const char *)name, options);
-    Py_END_ALLOW_THREADS
-    if (res) {
-        result = xattr_error_with_filename(path);
-    } else {
-        Py_INCREF(Py_None);
-        result = Py_None;
-    }
-    PyMem_Free(path);
-    PyMem_Free(name);
-    return result;
-}
-
-PyDoc_STRVAR(pydoc_fremovexattr,
-    "fremovexattr(fd, name, options=0) -> None\n"
-    "\n"
-    "..."
-);
-static PyObject*
-py_fremovexattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , PyObject *kwds) */
-{
-    /* static char *keywords[] = { "fd", "name", "options", NULL }; */
-    int fd;
-    char *name;
-    int options = 0;
-    int res;
-    if (!PyArg_ParseTuple(args, /* AndKeywords(args, kwds, */
-            "iet|i:fremovexattr", /* keywords, */
-            &fd,
-            Py_FileSystemDefaultEncoding, &name,
-            &options)) {
-        return NULL;
-    }
-    Py_BEGIN_ALLOW_THREADS
-    res = xattr_fremovexattr(fd, (const char *)name, options);
-    Py_END_ALLOW_THREADS
-    PyMem_Free(name);
-    if (res) {
-        return xattr_error();
-    }
-    Py_INCREF(Py_None);
-    return Py_None;
-}
-
-PyDoc_STRVAR(pydoc_listxattr,
-    "listxattr(path, options=0) -> str\n"
-    "\n"
-    "..."
-);
-static PyObject*
-py_listxattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , PyObject *kwds) */
-{
-    /* static char *keywords[] = { "path", "options", NULL }; */
-    PyObject *buffer;
-    char *path;
-    int options = 0;
-    ssize_t res;
-    if (!PyArg_ParseTuple(args, /* AndKeywords(args, kwds, */
-            "et|i:listxattr", /* keywords, */
-            Py_FileSystemDefaultEncoding, &path,
-            &options)) {
-        return NULL;
-    }
-    Py_BEGIN_ALLOW_THREADS
-    res = xattr_listxattr((const char *)path, NULL, 0, options);
-    Py_END_ALLOW_THREADS
-    if (res == -1) {    
-        PyObject *tmp = xattr_error_with_filename(path);
-        PyMem_Free(path);
-        return tmp;
-    }
-    buffer = PyString_FromStringAndSize((char *)NULL, (int)res);
-    if (buffer == NULL) {
-        PyMem_Free(path);
-        return NULL;
-    }
-    /* avoid 2nd listxattr call if the first one returns 0 */
-    if (res == 0) {
-        PyMem_Free(path);
-        return buffer;
-    }
-    Py_BEGIN_ALLOW_THREADS
-    res = xattr_listxattr((const char *)path, (void *)PyString_AS_STRING(buffer), (size_t)PyString_GET_SIZE(buffer), options);
-    Py_END_ALLOW_THREADS
-    if (res == -1) {
-        PyObject *tmp = xattr_error_with_filename(path);
-        Py_DECREF(buffer);
-        PyMem_Free(path);
-        return tmp;
-    }
-    PyMem_Free(path);
-    if (res != (ssize_t)PyString_GET_SIZE(buffer)) {
-        _PyString_Resize(&buffer, (int)res);
-    }
-    return buffer;
-}
-
-PyDoc_STRVAR(pydoc_flistxattr,
-    "flistxattr(fd, options=0) -> str\n"
-    "\n"
-    "..."
-);
-static PyObject*
-py_flistxattr(PyObject* self __attribute__((__unused__)), PyObject *args) /* , PyObject *kwds) */
-{
-    /* static char *keywords[] = { "fd", "options", NULL }; */
-    PyObject *buffer;
-    int fd;
-    int options = 0;
-    ssize_t res;
-    if (!PyArg_ParseTuple(args, /* AndKeywords(args, kwds, */
-            "i|i:flistxattr", /* keywords, */
-            &fd,
-            &options)) {
-        return NULL;
-    }
-    Py_BEGIN_ALLOW_THREADS
-    res = xattr_flistxattr(fd, NULL, 0, options);
-    Py_END_ALLOW_THREADS
-    if (res == -1) {    
-        return xattr_error();
-    }
-    buffer = PyString_FromStringAndSize((char *)NULL, (int)res);
-    if (buffer == NULL) {
-        return NULL;
-    }
-    Py_BEGIN_ALLOW_THREADS
-    res = xattr_flistxattr(fd, (void *)PyString_AS_STRING(buffer), (size_t)PyString_GET_SIZE(buffer), options);
-    Py_END_ALLOW_THREADS
-    if (res == -1) {
-        Py_DECREF(buffer);
-        return xattr_error();
-    }
-    if (res != (ssize_t)PyString_GET_SIZE(buffer)) {
-        _PyString_Resize(&buffer, (int)res);
-    }
-    return buffer;
-}
+XATTR_FINDERINFO_NAME = "com.apple.FinderInfo"
+XATTR_RESOURCEFORK_NAME = "com.apple.ResourceFork"
 
 
-#define DEFN(n) \
-    {  \
-        #n, \
-        (PyCFunction)py_ ##n, \
-        METH_VARARGS /* | METH_KEYWORDS */, \
-        pydoc_ ##n \
-    }
-static PyMethodDef xattr_methods[] = {
-    DEFN(getxattr),
-    DEFN(fgetxattr),
-    DEFN(setxattr),
-    DEFN(fsetxattr),
-    DEFN(removexattr),
-    DEFN(fremovexattr),
-    DEFN(listxattr),
-    DEFN(flistxattr),
-    {}
-};
-#undef DEFN
+def fs_encode(val):
+    if isinstance(val, bytes):
+        return val.encode(sys.getfilesystemencoding())
+    else:
+        return val
 
-void init_xattr(void);
 
-void
-init_xattr(void)
-{
-    PyObject *m;
-    m = Py_InitModule4("_xattr", xattr_methods, NULL, NULL, PYTHON_API_VERSION);
-}
+def error(path=None):
+    errno = ffi.errno
+    strerror = os.strerror(ffi.errno)
+    if path:
+        raise IOError(errno, strerror, path)
+    else:
+        raise IOError(errno, strerror)
+
+
+def _getxattr(path, name, size=0, position=0, options=0):
+    """
+    getxattr(path, name, size=0, position=0, options=0) -> str
+    """
+    path = fs_encode(path)
+    name = fs_encode(name)
+    if size == 0:
+        res = lib.xattr_getxattr(path, name, ffi.NULL, 0, position, options)
+        if res == -1:
+            raise error(path)
+        size = res
+    buf = ffi.new("char[]", size)
+    res = lib.xattr_getxattr(path, name, buf, size, position, options)
+    if res == -1:
+        raise error(path)
+    return ffi.buffer(buf)[:res]
+
+
+def _fgetxattr(fd, name, size=0, position=0, options=0):
+    """
+    fgetxattr(fd, name, size=0, position=0, options=0) -> str
+    """
+    name = fs_encode(name)
+    if size == 0:
+        res = lib.xattr_fgetxattr(fd, name, ffi.NULL, 0, position, options)
+        if res == -1:
+            raise error()
+        size = res
+    buf = ffi.new("char[]", size)
+    res = lib.xattr_fgetxattr(fd, name, buf, size, position, options)
+    if res == -1:
+        raise error()
+    return ffi.buffer(buf)[:res]
+
+
+def _setxattr(path, name, value, position=0, options=0):
+    """
+    setxattr(path, name, value, position=0, options=0) -> None
+    """
+    path = fs_encode(path)
+    name = fs_encode(name)
+    res = lib.xattr_setxattr(path, name, value, len(value), position, options)
+    if res:
+        raise error(path)
+
+
+def _fsetxattr(fd, name, value, position=0, options=0):
+    """
+    fsetxattr(fd, name, value, position=0, options=0) -> None
+    """
+    name = fs_encode(name)
+    res = lib.xattr_fsetxattr(fd, name, value, len(value), position, options)
+    if res:
+        raise error()
+
+
+def _removexattr(path, name, options=0):
+    """
+    removexattr(path, name, options=0) -> None
+    """
+    path = fs_encode(path)
+    name = fs_encode(name)
+    res = lib.xattr_removexattr(path, name, options)
+    if res:
+        raise error(path)
+
+
+def _fremovexattr(fd, name, options=0):
+    """
+    fremovexattr(fd, name, options=0) -> None
+    """
+    name = fs_encode(name)
+    res = lib.xattr_fremovexattr(fd, name, options)
+    if res:
+        raise error()
+
+
+def _listxattr(path, options=0):
+    """
+    listxattr(path, options=0) -> str
+    """
+    path = fs_encode(path)
+    res = lib.xattr_listxattr(path, ffi.NULL, 0, options)
+    if res == -1:
+        raise error(path)
+    elif res == 0:
+        return b""
+    buf = ffi.new("char[]", res)
+    res = lib.xattr_listxattr(path, buf, res, options)
+    if res == -1:
+        raise error(path)
+    return ffi.buffer(buf)[:res]
+
+
+def _flistxattr(fd, options=0):
+    """
+    flistxattr(fd, options=0) -> str
+    """
+    res = lib.xattr_flistxattr(fd, ffi.NULL, 0, options)
+    if res == 1:
+        raise error()
+    buf = ffi.new("char[]", res)
+    res = lib.xattr_flistxattr(fd, buf, res, options)
+    if res == -1:
+        raise error()
+    return ffi.buffer(buf)[:res]

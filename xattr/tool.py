@@ -28,8 +28,10 @@
 import sys
 import os
 import getopt
-import xattr
 import zlib
+
+import xattr
+
 
 def usage(e=None):
     if e:
@@ -57,19 +59,23 @@ def usage(e=None):
     else:
         sys.exit(0)
 
+
 class NullsInString(Exception):
     """Nulls in string."""
 
-_FILTER=''.join([(len(repr(chr(x)))==3) and chr(x) or '.' for x in range(256)])
+
+_FILTER = ''.join([(len(repr(chr(x))) == 3) and chr(x) or '.' for x in range(256)])
+
 
 def _dump(src, length=16):
-    result=[]
+    result = []
     for i in xrange(0, len(src), length):
         s = src[i:i+length]
-        hexa = ' '.join(["%02X"%ord(x) for x in s])
+        hexa = ' '.join(["%02X" % ord(x) for x in s])
         printable = s.translate(_FILTER)
         result.append("%04X   %-*s   %s\n" % (i, length*3, hexa, printable))
     return ''.join(result)
+
 
 def main():
     try:
@@ -77,14 +83,14 @@ def main():
     except getopt.GetoptError, e:
         usage(e)
 
-    attr_name   = None
+    attr_name = None
     long_format = False
-    read        = False
-    write       = False
-    delete      = False
-    compress    = lambda x: x
-    decompress  = compress
-    status      = 0
+    read = False
+    write = False
+    delete = False
+    compress = lambda x: x
+    decompress = compress
+    status = 0
 
     for opt, arg in optargs:
         if opt in ("-h", "--help"):
@@ -104,7 +110,7 @@ def main():
             if read or write:
                 usage("-d not allowed with -p or -w")
         elif opt == "-z":
-            compress   = zlib.compress
+            compress = zlib.compress
             decompress = zlib.decompress
 
     if write or delete:
@@ -132,7 +138,6 @@ def main():
                 sys.stderr.write("No such file: %s\n" % (filename,))
             else:
                 sys.stderr.write(str(e) + "\n")
-            status = 1
 
         try:
             attrs = xattr.xattr(filename)
@@ -185,7 +190,7 @@ def main():
                 if long_format:
                     try:
                         if attr_value.find('\0') >= 0:
-                            raise NullsInString;
+                            raise NullsInString
                         print "".join((file_prefix, "%s: " % (attr_name,), attr_value))
                     except (UnicodeDecodeError, NullsInString):
                         print "".join((file_prefix, "%s:" % (attr_name,)))

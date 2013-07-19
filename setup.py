@@ -1,9 +1,23 @@
 #!/usr/bin/env python
 
-import ez_setup
-ez_setup.use_setuptools()
+import os
+import sys
 
-from setuptools import setup, Extension
+from setuptools import setup
+
+# HACK for setup.py build, this way it can find cffi and thus make the
+# extension
+for path in os.listdir("."):
+    if path.endswith(".egg"):
+        sys.path.append(path)
+
+try:
+    from xattr import lib
+except ImportError:
+    ext_modules = []
+else:
+    ext_modules = [lib.ffi.verifier.get_extension()]
+
 
 VERSION = '0.6.4'
 DESCRIPTION = "Python wrapper for extended filesystem attributes"
@@ -16,7 +30,7 @@ Extended attributes are currently only available on Darwin 8.0+ (Mac OS X 10.4)
 and Linux 2.6+. Experimental support is included for Solaris and FreeBSD.
 """
 
-CLASSIFIERS = filter(None, map(str.strip,
+CLASSIFIERS = filter(bool, map(str.strip,
 """
 Environment :: Console
 Intended Audience :: Developers
@@ -41,14 +55,14 @@ setup(
     license="MIT License",
     packages=['xattr'],
     platforms=['MacOS X', 'Linux', 'FreeBSD', 'Solaris'],
-    ext_modules=[
-        Extension("xattr._xattr", ["xattr/_xattr.c"]),
-    ],
+    ext_modules=ext_modules,
     entry_points={
         'console_scripts': [
             "xattr = xattr.tool:main",
         ],
     },
+    install_requires=["cffi"],
+    setup_requires=["cffi"],
     test_suite="xattr.tests.all_tests_suite",
     zip_safe=False,
 )
