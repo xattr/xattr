@@ -2,7 +2,12 @@
 
 from setuptools import setup
 
-from xattr import lib
+try:
+    from xattr import lib
+except ImportError:
+    ext_modules = []
+else:
+    ext_modules = [lib.ffi.verifier.get_extension()]
 
 
 VERSION = '0.6.4'
@@ -41,14 +46,14 @@ setup(
     license="MIT License",
     packages=['xattr'],
     platforms=['MacOS X', 'Linux', 'FreeBSD', 'Solaris'],
-    ext_modules=[
-        lib.ffi.verifier.get_extension()
-    ],
+    ext_modules=ext_modules,
     entry_points={
         'console_scripts': [
             "xattr = xattr.tool:main",
         ],
     },
+    install_requires=["cffi"],
+    setup_requires=["cffi"],
     test_suite="xattr.tests.all_tests_suite",
     zip_safe=False,
 )
