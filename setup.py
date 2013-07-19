@@ -1,6 +1,15 @@
 #!/usr/bin/env python
 
+import os
+import sys
+
 from setuptools import setup
+
+# HACK for setup.py build, this way it can find cffi and thus make the
+# extension
+for path in os.listdir("."):
+    if path.endswith(".egg"):
+        sys.path.append(path)
 
 try:
     from xattr import lib
