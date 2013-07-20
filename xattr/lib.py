@@ -602,7 +602,7 @@ XATTR_RESOURCEFORK_NAME = "com.apple.ResourceFork"
 
 
 def fs_encode(val):
-    if isinstance(val, bytes):
+    if not isinstance(val, bytes):
         return val.encode(sys.getfilesystemencoding())
     else:
         return val

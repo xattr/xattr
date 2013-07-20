@@ -11,15 +11,15 @@ class BaseTestXattr(object):
         self.assertEqual(x.keys(), [])
         self.assertEqual(dict(x), {})
 
-        x['user.sopal'] = 'foo'
-        x['user.sop.foo'] = 'bar'
+        x['user.sopal'] = b'foo'
+        x['user.sop.foo'] = b'bar'
         del x
 
         x = xattr.xattr(self.tempfile)
         self.assertTrue('user.sopal' in x)
-        self.assertEqual(x['user.sopal'], 'foo')
+        self.assertEqual(x['user.sopal'], b'foo')
         self.assertTrue('user.sop.foo' in x)
-        self.assertEqual(x['user.sop.foo'], 'bar')
+        self.assertEqual(x['user.sop.foo'], b'bar')
 
         del x['user.sop.foo']
         del x
@@ -33,9 +33,9 @@ class BaseTestXattr(object):
         try:
             symlink = xattr.xattr(symlinkPath, options=xattr.XATTR_NOFOLLOW)
             realfile = xattr.xattr(self.tempfilename)
-            symlink['user.islink'] = 'true'
+            symlink['user.islink'] = b'true'
             self.assertEqual(dict(realfile), {})
-            self.assertEqual(symlink['user.islink'], 'true')
+            self.assertEqual(symlink['user.islink'], b'true')
         finally:
             os.remove(symlinkPath)
 
