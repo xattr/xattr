@@ -16,7 +16,7 @@ class cffi_build(build):
         self.distribution.ext_modules = [ffi.verifier.get_extension()]
         build.finalize_options(self)
 
-VERSION = '0.7.1'
+VERSION = '0.7.2'
 DESCRIPTION = "Python wrapper for extended filesystem attributes"
 LONG_DESCRIPTION = """
 Extended attributes extend the basic attributes of files and directories
