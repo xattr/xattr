@@ -13,6 +13,7 @@ class BaseTestXattr(object):
 
         x['user.sopal'] = b'foo'
         x['user.sop.foo'] = b'bar'
+        x[u'user.\N{SNOWMAN}'] = b'not a snowman'
         del x
 
         x = xattr.xattr(self.tempfile)
@@ -20,7 +21,11 @@ class BaseTestXattr(object):
         self.assertEqual(x['user.sopal'], b'foo')
         self.assertTrue('user.sop.foo' in x)
         self.assertEqual(x['user.sop.foo'], b'bar')
-
+        self.assertTrue(u'user.\N{SNOWMAN}' in x)
+        self.assertEqual(x[u'user.\N{SNOWMAN}'],
+                         b'not a snowman')
+        
+        del x[u'user.\N{SNOWMAN}']
         del x['user.sop.foo']
         del x
 

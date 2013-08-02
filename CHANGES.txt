@@ -1,3 +1,7 @@
+Version 0.7.3 released XXXX-XX-XX
+
+* Added some unicode-specific tests
+
 Version 0.7.2 released 2013-07-22
 
 * Added Python 3 support.
