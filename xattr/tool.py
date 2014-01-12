@@ -25,6 +25,8 @@
 # IN THE SOFTWARE.
 ##
 
+from __future__ import print_function
+
 import sys
 import os
 import getopt
@@ -35,24 +37,24 @@ import xattr
 
 def usage(e=None):
     if e:
-        print e
-        print ""
+        print(e)
+        print("")
 
     name = os.path.basename(sys.argv[0])
-    print "usage: %s [-lz] file [file ...]" % (name,)
-    print "       %s -p [-lz] attr_name file [file ...]" % (name,)
-    print "       %s -w [-z] attr_name attr_value file [file ...]" % (name,)
-    print "       %s -d attr_name file [file ...]" % (name,)
-    print ""
-    print "The first form lists the names of all xattrs on the given file(s)."
-    print "The second form (-p) prints the value of the xattr attr_name."
-    print "The third form (-w) sets the value of the xattr attr_name to attr_value."
-    print "The fourth form (-d) deletes the xattr attr_name."
-    print ""
-    print "options:"
-    print "  -h: print this help"
-    print "  -l: print long format (attr_name: attr_value)"
-    print "  -z: compress or decompress (if compressed) attribute value in zip format"
+    print("usage: %s [-lz] file [file ...]" % (name,))
+    print("       %s -p [-lz] attr_name file [file ...]" % (name,))
+    print("       %s -w [-z] attr_name attr_value file [file ...]" % (name,))
+    print("       %s -d attr_name file [file ...]" % (name,))
+    print("")
+    print("The first form lists the names of all xattrs on the given file(s).")
+    print("The second form (-p) prints the value of the xattr attr_name.")
+    print("The third form (-w) sets the value of the xattr attr_name to attr_value.")
+    print("The fourth form (-d) deletes the xattr attr_name.")
+    print("")
+    print("options:")
+    print("  -h: print this help")
+    print("  -l: print long format (attr_name: attr_value)")
+    print("  -z: compress or decompress (if compressed) attribute value in zip format")
 
     if e:
         sys.exit(64)
@@ -80,7 +82,7 @@ def _dump(src, length=16):
 def main():
     try:
         (optargs, args) = getopt.getopt(sys.argv[1:], "hlpwdz", ["help"])
-    except getopt.GetoptError, e:
+    except getopt.GetoptError as e:
         usage(e)
 
     attr_name = None
@@ -141,21 +143,21 @@ def main():
 
         try:
             attrs = xattr.xattr(filename)
-        except (IOError, OSError), e:
+        except (IOError, OSError) as e:
             onError(e)
             continue
 
         if write:
             try:
                 attrs[attr_name] = compress(attr_value)
-            except (IOError, OSError), e:
+            except (IOError, OSError) as e:
                 onError(e)
                 continue
 
         elif delete:
             try:
                 del attrs[attr_name]
-            except (IOError, OSError), e:
+            except (IOError, OSError) as e:
                 onError(e)
                 continue
             except KeyError:
@@ -168,7 +170,7 @@ def main():
                     attr_names = (attr_name,)
                 else:
                     attr_names = attrs.keys()
-            except (IOError, OSError), e:
+            except (IOError, OSError) as e:
                 onError(e)
                 continue
 
@@ -191,15 +193,15 @@ def main():
                     try:
                         if attr_value.find('\0') >= 0:
                             raise NullsInString
-                        print "".join((file_prefix, "%s: " % (attr_name,), attr_value))
+                        print("".join((file_prefix, "%s: " % (attr_name,), attr_value)))
                     except (UnicodeDecodeError, NullsInString):
-                        print "".join((file_prefix, "%s:" % (attr_name,)))
-                        print _dump(attr_value)
+                        print("".join((file_prefix, "%s:" % (attr_name,))))
+                        print(_dump(attr_value))
                 else:
                     if read:
-                        print "".join((file_prefix, attr_value))
+                        print("".join((file_prefix, attr_value)))
                     else:
-                        print "".join((file_prefix, attr_name))
+                        print("".join((file_prefix, attr_name)))
 
     sys.exit(status)
 
