@@ -6,6 +6,7 @@ import sys
 from setuptools import setup
 from distutils.command.build import build
 
+
 class cffi_build(build):
     """This is a shameful hack to ensure that cffi is present when
     we specify ext_modules. We can't do this eagerly because
