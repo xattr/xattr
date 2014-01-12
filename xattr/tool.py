@@ -82,7 +82,7 @@ def _dump(src, length=16):
 def main():
     try:
         (optargs, args) = getopt.getopt(sys.argv[1:], "hlpwdz", ["help"])
-    except getopt.GetoptError, e:
+    except getopt.GetoptError as e:
         usage(e)
 
     attr_name = None
@@ -143,21 +143,21 @@ def main():
 
         try:
             attrs = xattr.xattr(filename)
-        except (IOError, OSError), e:
+        except (IOError, OSError) as e:
             onError(e)
             continue
 
         if write:
             try:
                 attrs[attr_name] = compress(attr_value)
-            except (IOError, OSError), e:
+            except (IOError, OSError) as e:
                 onError(e)
                 continue
 
         elif delete:
             try:
                 del attrs[attr_name]
-            except (IOError, OSError), e:
+            except (IOError, OSError) as e:
                 onError(e)
                 continue
             except KeyError:
@@ -170,7 +170,7 @@ def main():
                     attr_names = (attr_name,)
                 else:
                     attr_names = attrs.keys()
-            except (IOError, OSError), e:
+            except (IOError, OSError) as e:
                 onError(e)
                 continue
 
