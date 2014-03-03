@@ -89,13 +89,13 @@ class xattr(object):
     def list(self, options=0):
         """
         Retrieves the extended attributes currently set as a list
-        of unicode strings.  Raises ``IOError`` on failure.
+        of strings.  Raises ``IOError`` on failure.
 
         See x-man-page://2/listxattr for options and possible errors.
         """
         res = self._call(_listxattr, _flistxattr, options | self.options).split(b'\x00')
         res.pop()
-        return [unicode(s, 'utf-8') for s in res]
+        return [s.decode('utf-8') for s in res]
 
     # dict-like methods
 
