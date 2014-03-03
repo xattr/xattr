@@ -9,6 +9,7 @@ class BaseTestXattr(object):
     def test_attr(self):
         x = xattr.xattr(self.tempfile)
         self.assertEqual(x.keys(), [])
+        self.assertEqual(x.list(), [])
         self.assertEqual(dict(x), {})
 
         x['user.sopal'] = b'foo'
@@ -17,14 +18,18 @@ class BaseTestXattr(object):
         del x
 
         x = xattr.xattr(self.tempfile)
+        attrs = set(x.list())
         self.assertTrue('user.sopal' in x)
+        self.assertTrue(u'user.sopal' in attrs)
         self.assertEqual(x['user.sopal'], b'foo')
         self.assertTrue('user.sop.foo' in x)
+        self.assertTrue(u'user.sop.foo' in attrs)
         self.assertEqual(x['user.sop.foo'], b'bar')
         self.assertTrue(u'user.\N{SNOWMAN}' in x)
+        self.assertTrue(u'user.\N{SNOWMAN}' in attrs)
         self.assertEqual(x[u'user.\N{SNOWMAN}'],
                          b'not a snowman')
-        
+
         del x[u'user.\N{SNOWMAN}']
         del x['user.sop.foo']
         del x

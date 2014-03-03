@@ -1,3 +1,8 @@
+Version 0.7.4 released 2014-03-03
+
+* Improved Python 3 compatibility
+  https://github.com/xattr/xattr/pull/22
+
 Version 0.7.3 released 2014-01-06
 
 * Added some unicode-specific tests
