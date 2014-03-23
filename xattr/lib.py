@@ -608,6 +608,13 @@ def fs_encode(val):
         return val
 
 
+def _check_bytes(val):
+    if not isinstance(val, bytes):
+        raise TypeError(
+            "Value must be bytes, %s was passed." % type(val).__name__
+        )
+
+
 def error(path=None):
     errno = ffi.errno
     strerror = os.strerror(ffi.errno)
@@ -656,6 +663,7 @@ def _setxattr(path, name, value, position=0, options=0):
     """
     setxattr(path, name, value, position=0, options=0) -> None
     """
+    _check_bytes(value)
     path = fs_encode(path)
     name = fs_encode(name)
     res = lib.xattr_setxattr(path, name, value, len(value), position, options)
@@ -667,6 +675,7 @@ def _fsetxattr(fd, name, value, position=0, options=0):
     """
     fsetxattr(fd, name, value, position=0, options=0) -> None
     """
+    _check_bytes(value)
     name = fs_encode(name)
     res = lib.xattr_fsetxattr(fd, name, value, len(value), position, options)
     if res:
