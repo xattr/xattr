@@ -1,4 +1,5 @@
 import os
+import sys
 from unittest import TestCase
 from tempfile import mkdtemp, NamedTemporaryFile
 
@@ -36,6 +37,16 @@ class BaseTestXattr(object):
 
         x = xattr.xattr(self.tempfile)
         self.assertTrue('user.sop.foo' not in x)
+
+    def test_setxattr_unicode_error(self):
+        x = xattr.xattr(self.tempfile)
+        with self.assertRaises(TypeError) as exc_info:
+            x['abc'] = u'abc'
+        if sys.version_info[0] >= 3:
+            msg = "Value must be bytes, str was passed."
+        else:
+            msg = "Value must be bytes, unicode was passed."
+        self.assertEqual(str(exc_info.exception), msg)
 
     def test_symlink_attrs(self):
         symlinkPath = self.tempfilename + '.link'
