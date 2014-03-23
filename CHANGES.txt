@@ -1,3 +1,9 @@
+Version 0.7.5 released 2014-03-23
+
+* Improved error message when str/unicode is passed where bytes is
+  required
+  https://github.com/xattr/xattr/pull/24
+
 Version 0.7.4 released 2014-03-03
 
 * Improved Python 3 compatibility
