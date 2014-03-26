@@ -9,9 +9,18 @@ import xattr
 class BaseTestXattr(object):
     def test_attr(self):
         x = xattr.xattr(self.tempfile)
-        self.assertEqual(x.keys(), [])
-        self.assertEqual(x.list(), [])
-        self.assertEqual(dict(x), {})
+
+        # Solaris 11 and forward contain system attributes (file flags) in
+        # extended attributes present on all files, so cons them up into a
+        # comparison dict.
+        d = {}
+        if sys.platform == 'sunos5' and 'SUNWattr_ro' in x:
+            d['SUNWattr_ro'] = x['SUNWattr_ro']
+            d['SUNWattr_rw'] = x['SUNWattr_rw']
+
+        self.assertEqual(x.keys(), d.keys())
+        self.assertEqual(x.list(), d.keys())
+        self.assertEqual(dict(x), d)
 
         x['user.sopal'] = b'foo'
         x['user.sop.foo'] = b'bar'
@@ -40,15 +49,24 @@ class BaseTestXattr(object):
 
     def test_setxattr_unicode_error(self):
         x = xattr.xattr(self.tempfile)
-        with self.assertRaises(TypeError) as exc_info:
+        def assign():
             x['abc'] = u'abc'
+        self.assertRaises(TypeError, assign)
+
         if sys.version_info[0] >= 3:
             msg = "Value must be bytes, str was passed."
         else:
             msg = "Value must be bytes, unicode was passed."
-        self.assertEqual(str(exc_info.exception), msg)
+
+        try:
+            assign()
+        except TypeError, e:
+            self.assertEqual(str(e), msg)
 
     def test_symlink_attrs(self):
+        # Solaris doesn't support extended attributes on symlinks
+        if sys.platform == 'sunos5':
+            return
         symlinkPath = self.tempfilename + '.link'
         os.symlink(self.tempfilename, symlinkPath)
         try:
