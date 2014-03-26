@@ -27,7 +27,7 @@ Extended attributes are currently only available on Darwin 8.0+ (Mac OS X 10.4)
 and Linux 2.6+. Experimental support is included for Solaris and FreeBSD.
 """
 
-CLASSIFIERS = filter(bool, map(str.strip,
+CLASSIFIERS = list(filter(bool, list(map(str.strip,
 """
 Environment :: Console
 Intended Audience :: Developers
@@ -40,7 +40,7 @@ Programming Language :: Python
 Programming Language :: Python :: 2
 Programming Language :: Python :: 3
 Topic :: Software Development :: Libraries :: Python Modules
-""".splitlines()))
+""".splitlines()))))
 
 setup(
     name="xattr",

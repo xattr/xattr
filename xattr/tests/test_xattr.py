@@ -9,29 +9,29 @@ import xattr
 class BaseTestXattr(object):
     def test_attr(self):
         x = xattr.xattr(self.tempfile)
-        self.assertEqual(x.keys(), [])
+        self.assertEqual(list(x.keys()), [])
         self.assertEqual(x.list(), [])
         self.assertEqual(dict(x), {})
 
         x['user.sopal'] = b'foo'
         x['user.sop.foo'] = b'bar'
-        x[u'user.\N{SNOWMAN}'] = b'not a snowman'
+        x['user.\N{SNOWMAN}'] = b'not a snowman'
         del x
 
         x = xattr.xattr(self.tempfile)
         attrs = set(x.list())
         self.assertTrue('user.sopal' in x)
-        self.assertTrue(u'user.sopal' in attrs)
+        self.assertTrue('user.sopal' in attrs)
         self.assertEqual(x['user.sopal'], b'foo')
         self.assertTrue('user.sop.foo' in x)
-        self.assertTrue(u'user.sop.foo' in attrs)
+        self.assertTrue('user.sop.foo' in attrs)
         self.assertEqual(x['user.sop.foo'], b'bar')
-        self.assertTrue(u'user.\N{SNOWMAN}' in x)
-        self.assertTrue(u'user.\N{SNOWMAN}' in attrs)
-        self.assertEqual(x[u'user.\N{SNOWMAN}'],
+        self.assertTrue('user.\N{SNOWMAN}' in x)
+        self.assertTrue('user.\N{SNOWMAN}' in attrs)
+        self.assertEqual(x['user.\N{SNOWMAN}'],
                          b'not a snowman')
 
-        del x[u'user.\N{SNOWMAN}']
+        del x['user.\N{SNOWMAN}']
         del x['user.sop.foo']
         del x
 
@@ -41,7 +41,7 @@ class BaseTestXattr(object):
     def test_setxattr_unicode_error(self):
         x = xattr.xattr(self.tempfile)
         with self.assertRaises(TypeError) as exc_info:
-            x['abc'] = u'abc'
+            x['abc'] = 'abc'
         if sys.version_info[0] >= 3:
             msg = "Value must be bytes, str was passed."
         else:
