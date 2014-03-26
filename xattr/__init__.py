@@ -133,17 +133,17 @@ class xattr(object):
     __contains__ = has_key
 
     def clear(self):
-        for k in self.keys():
+        for k in list(self.keys()):
             del self[k]
 
     def update(self, seq):
         if not hasattr(seq, 'iteritems'):
             seq = dict(seq)
-        for k, v in seq.iteritems():
+        for k, v in seq.items():
             self[k] = v
 
     def copy(self):
-        return dict(self.iteritems())
+        return dict(iter(self.items()))
 
     def setdefault(self, k, d=''):
         try:
@@ -156,18 +156,18 @@ class xattr(object):
         return self.list()
 
     def itervalues(self):
-        for k, v in self.iteritems():
+        for k, v in self.items():
             yield v
 
     def values(self):
-        return list(self.itervalues())
+        return list(self.values())
 
     def iteritems(self):
         for k in self.list():
             yield k, self.get(k)
 
     def items(self):
-        return list(self.iteritems())
+        return list(self.items())
 
 
 def listxattr(f, symlink=False):
