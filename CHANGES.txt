@@ -1,3 +1,8 @@
+Version 0.7.6 released 2014-03-27
+
+* Fixed Solaris & Solaris Studio support and Python 2.6 compatibility
+  https://github.com/xattr/xattr/pull/29
+
 Version 0.7.5 released 2014-03-23
 
 * Improved error message when str/unicode is passed where bytes is

@@ -18,8 +18,8 @@ class BaseTestXattr(object):
             d['SUNWattr_ro'] = x['SUNWattr_ro']
             d['SUNWattr_rw'] = x['SUNWattr_rw']
 
-        self.assertEqual(x.keys(), d.keys())
-        self.assertEqual(x.list(), d.keys())
+        self.assertEqual(list(x.keys()), list(d.keys()))
+        self.assertEqual(list(x.list()), list(d.keys()))
         self.assertEqual(dict(x), d)
 
         x['user.sopal'] = b'foo'
@@ -60,7 +60,8 @@ class BaseTestXattr(object):
 
         try:
             assign()
-        except TypeError, e:
+        except TypeError:
+            e = sys.exc_info()[1]
             self.assertEqual(str(e), msg)
 
     def test_symlink_attrs(self):
