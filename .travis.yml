@@ -1,5 +1,5 @@
 language: objective-c
 script:
-  - python setup.py build_ext -i
+  - ARCHFLAGS="-Wno-error=unused-command-line-argument-hard-error-in-future" python setup.py build_ext -i
   - python -m compileall -f xattr
   - python setup.py test
