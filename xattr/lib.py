@@ -101,7 +101,7 @@ static ssize_t xattr_setxattr(const char *path, const char *name,
     if (options == XATTR_XATTR_CREATE ||
         options == XATTR_XATTR_REPLACE) {
 
-        /* meh. FreeBSD doesn't really have this in it's
+        /* meh. FreeBSD doesn't really have this in its
          * API... Oh well.
          */
     }
