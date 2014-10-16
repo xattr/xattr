@@ -78,6 +78,16 @@ class BaseTestXattr(object):
             self.assertEqual(symlink['user.islink'], b'true')
         finally:
             os.remove(symlinkPath)
+    
+    def test_bad_name_prefix(self):
+        xfile = xattr.xattr(self.tempfile)
+        xfile['testing'] = b'fail'
+        self.assertEqual('testing' not in xfile)
+
+    def test_good_name_prefix(self):
+        xfile = xattr.xattr(self.tempfile)
+        xfile['user.testing'] = b'pass'
+        self.assertEqual('user.testing' in xfile)
 
 
 class TestFile(TestCase, BaseTestXattr):
