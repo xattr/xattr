@@ -190,3 +190,8 @@ def removexattr(f, attr, symlink=False, nofollow=False):
     symlink = symlink or nofollow
     options = symlink and XATTR_NOFOLLOW or 0
     return xattr(f).remove(attr, options=options)
+
+# aliases for compatibility with pyxattr
+get = getxattr
+set = setxattr
+remove = removexattr
