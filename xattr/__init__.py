@@ -179,14 +179,18 @@ def getxattr(f, attr, symlink=False, nofollow=False):
     symlink = symlink or nofollow
     return xattr(f).get(attr, options=symlink and XATTR_NOFOLLOW or 0)
 
+get = getxattr
 
 def setxattr(f, attr, value, options=0, symlink=False, nofollow=False):
     if symlink or nofollow:
         options |= XATTR_NOFOLLOW
     return xattr(f).set(attr, value, options=options)
 
+set = setxattr
 
 def removexattr(f, attr, symlink=False, nofollow=False):
     symlink = symlink or nofollow
     options = symlink and XATTR_NOFOLLOW or 0
     return xattr(f).remove(attr, options=options)
+
+remove = removexattr
