@@ -162,12 +162,12 @@ class xattr(object):
     def values(self):
         return list(self.itervalues())
 
-    def iteritems(self):
-        for k in self.list():
+    def iteritems(self, options=0):
+        for k in self.list(options=options):
             yield k, self.get(k)
 
-    def items(self):
-        return list(self.iteritems())
+    def items(self, options=0):
+        return list(self.iteritems(options=options))
 
 
 def listxattr(f, symlink=False):
