@@ -170,20 +170,23 @@ class xattr(object):
         return list(self.iteritems(options=options))
 
 
-def listxattr(f, symlink=False):
+def listxattr(f, symlink=False, nofollow=False):
+    symlink = symlink or nofollow
     return tuple(xattr(f).list(options=symlink and XATTR_NOFOLLOW or 0))
 
 
-def getxattr(f, attr, symlink=False):
+def getxattr(f, attr, symlink=False, nofollow=False):
+    symlink = symlink or nofollow
     return xattr(f).get(attr, options=symlink and XATTR_NOFOLLOW or 0)
 
 
-def setxattr(f, attr, value, options=0, symlink=False):
-    if symlink:
+def setxattr(f, attr, value, options=0, symlink=False, nofollow=False):
+    if symlink or nofollow:
         options |= XATTR_NOFOLLOW
     return xattr(f).set(attr, value, options=options)
 
 
-def removexattr(f, attr, symlink=False):
+def removexattr(f, attr, symlink=False, nofollow=False):
+    symlink = symlink or nofollow
     options = symlink and XATTR_NOFOLLOW or 0
     return xattr(f).remove(attr, options=options)
