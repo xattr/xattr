@@ -180,6 +180,12 @@ def getxattr(f, attr, symlink=False, nofollow=False):
     return xattr(f).get(attr, options=symlink and XATTR_NOFOLLOW or 0)
 
 
+def get_all(f, symlink=False, nofollow=False):
+    symlink = symlink or nofollow
+    options = symlink and XATTR_NOFOLLOW or 0
+    return xattr(f).items(options=options)
+
+
 def setxattr(f, attr, value, options=0, symlink=False, nofollow=False):
     if symlink or nofollow:
         options |= XATTR_NOFOLLOW
