@@ -95,7 +95,7 @@ class xattr(object):
         """
         res = self._call(_listxattr, _flistxattr, options | self.options).split(b'\x00')
         res.pop()
-        return [s.decode('utf-8') for s in res]
+        return res
 
     # dict-like methods
 
