@@ -160,14 +160,14 @@ class xattr(object):
             yield v
 
     def values(self):
-        return list(self.itervalues())
+        return [x for x in self.itervalues()]
 
     def iteritems(self, options=0):
         for k in self.list(options=options):
             yield k, self.get(k)
 
     def items(self, options=0):
-        return list(self.iteritems(options=options))
+        return [x for x in self.iteritems(options=options)]
 
 
 def listxattr(f, symlink=False, nofollow=False):
@@ -195,3 +195,4 @@ def removexattr(f, attr, symlink=False, nofollow=False):
 get = getxattr
 set = setxattr
 remove = removexattr
+list = listxattr
