@@ -543,7 +543,7 @@ static ssize_t xattr_fsetxattr(int fd, const char *name, void *value, ssize_t si
     } else if (options != 0) {
         return -1;
     }
-    if (options & XATTR_XATTR_NOFOLLOW) {
+    if (nofollow) {
         return -1;
     } else {
         return fsetxattr(fd, name, value, size, options);
