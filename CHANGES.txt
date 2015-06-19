@@ -1,3 +1,8 @@
+Version 0.7.7 released 2015-06-19
+
+* Fixed FreeBSD build
+  https://github.com/xattr/xattr/pull/32
+
 Version 0.7.6 released 2014-03-27
 
 * Fixed Solaris & Solaris Studio support and Python 2.6 compatibility
