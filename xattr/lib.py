@@ -608,8 +608,14 @@ XATTR_RESOURCEFORK_NAME = "com.apple.ResourceFork"
 
 
 def fs_encode(val):
+    encoding = sys.getfilesystemencoding()
+    if encoding == 'mbcs':
+        errors = 'strict'
+    else:
+        errors = 'surrogateescape'
+
     if not isinstance(val, bytes):
-        return val.encode(sys.getfilesystemencoding())
+        return val.encode(encoding, errors)
     else:
         return val
 
