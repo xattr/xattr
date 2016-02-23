@@ -607,12 +607,7 @@ XATTR_FINDERINFO_NAME = "com.apple.FinderInfo"
 XATTR_RESOURCEFORK_NAME = "com.apple.ResourceFork"
 
 
-def fs_encode(val):
-    if not isinstance(val, bytes):
-        return val.encode(sys.getfilesystemencoding())
-    else:
-        return val
-
+fs_encode = os.fsencode
 
 def _check_bytes(val):
     if not isinstance(val, bytes):
