@@ -606,18 +606,20 @@ XATTR_MAXNAMELEN = lib.XATTR_MAXNAMELEN
 XATTR_FINDERINFO_NAME = "com.apple.FinderInfo"
 XATTR_RESOURCEFORK_NAME = "com.apple.ResourceFork"
 
+try:
+    fs_encode = os.fsencode
+except AttributeError:
+    def fs_encode(val):
+        encoding = sys.getfilesystemencoding()
+        if encoding == 'mbcs':
+            errors = 'strict'
+        else:
+            errors = 'surrogateescape'
 
-def fs_encode(val):
-    encoding = sys.getfilesystemencoding()
-    if encoding == 'mbcs':
-        errors = 'strict'
-    else:
-        errors = 'surrogateescape'
-
-    if not isinstance(val, bytes):
-        return val.encode(encoding, errors)
-    else:
-        return val
+        if not isinstance(val, bytes):
+            return val.encode(encoding, errors)
+        else:
+            return val
 
 
 def _check_bytes(val):
