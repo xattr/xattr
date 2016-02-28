@@ -5,10 +5,10 @@ import cffi
 
 ffi = cffi.FFI()
 ffi.cdef("""
-#define XATTR_NOFOLLOW ...
-#define XATTR_CREATE ...
-#define XATTR_REPLACE ...
-#define XATTR_NOSECURITY ...
+#define XATTR_XATTR_NOFOLLOW ...
+#define XATTR_XATTR_CREATE ...
+#define XATTR_XATTR_REPLACE ...
+#define XATTR_XATTR_NOSECURITY ...
 #define XATTR_MAXNAMELEN ...
 
 ssize_t xattr_getxattr(const char *, const char *, void *, ssize_t, uint32_t, int);
@@ -543,7 +543,7 @@ static ssize_t xattr_fsetxattr(int fd, const char *name, void *value, ssize_t si
     } else if (options != 0) {
         return -1;
     }
-    if (options & XATTR_XATTR_NOFOLLOW) {
+    if (nofollow) {
         return -1;
     } else {
         return fsetxattr(fd, name, value, size, options);
@@ -582,25 +582,23 @@ static ssize_t xattr_flistxattr(int fd, char *namebuf, size_t size, int options)
 #define xattr_fsetxattr fsetxattr
 #define xattr_listxattr listxattr
 #define xattr_flistxattr flistxattr
+
+/* define these for use in python (see below) */
+#define XATTR_XATTR_NOFOLLOW	XATTR_NOFOLLOW
+#define XATTR_XATTR_CREATE	XATTR_CREATE
+#define XATTR_XATTR_REPLACE	XATTR_REPLACE
+#define XATTR_XATTR_NOSECURITY	XATTR_NOSECURITY
 #endif
 
 #ifndef XATTR_MAXNAMELEN
 #define XATTR_MAXNAMELEN 127
 #endif
-
-#ifndef XATTR_NOFOLLOW
-#define XATTR_NOFOLLOW 0x0001
-#endif
-
-#ifndef XATTR_NOSECURITY
-#define XATTR_NOSECURITY 0x0008
-#endif
 """, ext_package='xattr')
 
-XATTR_NOFOLLOW = lib.XATTR_NOFOLLOW
-XATTR_CREATE = lib.XATTR_CREATE
-XATTR_REPLACE = lib.XATTR_REPLACE
-XATTR_NOSECURITY = lib.XATTR_NOSECURITY
+XATTR_NOFOLLOW = lib.XATTR_XATTR_NOFOLLOW
+XATTR_CREATE = lib.XATTR_XATTR_CREATE
+XATTR_REPLACE = lib.XATTR_XATTR_REPLACE
+XATTR_NOSECURITY = lib.XATTR_XATTR_NOSECURITY
 XATTR_MAXNAMELEN = lib.XATTR_MAXNAMELEN
 
 XATTR_FINDERINFO_NAME = "com.apple.FinderInfo"
