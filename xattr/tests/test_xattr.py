@@ -1,6 +1,7 @@
 import os
 import sys
-from unittest import TestCase, SkipTest
+import unittest
+from unittest import TestCase
 from tempfile import mkdtemp, NamedTemporaryFile
 
 import xattr
@@ -88,12 +89,6 @@ class TestFile(TestCase, BaseTestXattr):
     def tearDown(self):
         self.tempfile.close()
 
-class TestFileWithSurrogates(TestFile):
-    def setUp(self):
-        if sys.platform != 'linux':
-            raise SkipTest('Files with invalid encoded names are only supported under linux')
-        self.tempfile = NamedTemporaryFile(prefix=b'invalid-\xe9'.decode('utf8','surrogateescape'))
-        self.tempfilename = self.tempfile.name
 
 class TestDir(TestCase, BaseTestXattr):
     def setUp(self):
@@ -102,3 +97,17 @@ class TestDir(TestCase, BaseTestXattr):
 
     def tearDown(self):
         os.rmdir(self.tempfile)
+
+
+try:
+    # SkipTest is only available in Python 2.7+
+    unittest.SkipTest
+except AttributeError:
+    pass
+else:
+    class TestFileWithSurrogates(TestFile):
+        def setUp(self):
+            if sys.platform != 'linux':
+                raise unittest.SkipTest('Files with invalid encoded names are only supported under linux')
+            self.tempfile = NamedTemporaryFile(prefix=b'invalid-\xe9'.decode('utf8','surrogateescape'))
+            self.tempfilename = self.tempfile.name
