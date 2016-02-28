@@ -1,5 +1,35 @@
-language: objective-c
+language: python
+cache:
+  directories:
+  - "$HOME/.cache/pip"
+  - "$HOME/.pyenv"
+matrix:
+  include:
+  - os: osx
+    language: objective-c
+  - os: osx
+    language: objective-c
+    env: PYENV_VERSION=pypy3-2.4.0
+  - os: osx
+    language: objective-c
+    env: PYENV_VERSION=pypy-4.0.1
+  - os: osx
+    language: objective-c
+    env: PYENV_VERSION=2.7.11
+  - os: osx
+    language: objective-c
+    env: PYENV_VERSION=3.5.1
+install:
+- "./.travis/install.sh"
 script:
-  - ARCHFLAGS="-Wno-error=unused-command-line-argument-hard-error-in-future" python setup.py build_ext -i
-  - python -m compileall -f xattr
-  - python setup.py test
+- "./.travis/run.sh"
+deploy:
+  provider: releases
+  api_key:
+    secure: Z5m7K1UVq0812nNtR+QAkUE3lxUwhMjM3EDWUOyPmfh0rmOsU2RgQ8oBfT1vatYfY8ExnrG4rRNWmwUqPEIzZmRLmw9zv+ixA3gcVPn6WbbMkwoeIurOPsC9wjgCckDFKYhMda8a92FSL2hVto3JPcRNTZnsKBR35Queray55SM=
+  file: dist/*.whl
+  file_glob: true
+  on:
+    repo: xattr/xattr
+    tags: true
+  skip_cleanup: true
