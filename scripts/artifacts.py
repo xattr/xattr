@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 try:
     from urllib.request import urlopen
 except ImportError:
