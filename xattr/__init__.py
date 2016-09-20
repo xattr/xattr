@@ -53,7 +53,7 @@ class xattr(object):
         return "<%s %s=%r>" % (type(self).__name__, flavor, self.value)
 
     def _call(self, name_func, fd_func, *args):
-        if isinstance(self.value, int):
+        if isinstance(self.value, (int, long)):
             return fd_func(self.value, *args)
         else:
             return name_func(self.value, *args)
