@@ -12,6 +12,7 @@ if [[ -n "$PYENV_VERSION" ]]; then
     fi
     PYENV_ROOT="$HOME/.pyenv-xattr"
     PATH="$PYENV_ROOT/bin:$PATH"
+    hash -r
     eval "$(pyenv init -)"
     hash -r
     pyenv install --list
