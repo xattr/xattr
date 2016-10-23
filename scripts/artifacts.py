@@ -7,7 +7,10 @@ except ImportError:
 
 import io
 import json
+import os
+import re
 import subprocess
+import sys
 
 
 def get_json(url):
@@ -44,7 +47,7 @@ def get_version():
     return subprocess.check_output([sys.executable, 'setup.py', '--version']).strip()
 
 def artifact_matcher(version):
-    return re.compile('^simplejson-{}.*\\.(exe|whl)$'.format(re.escape(version)))
+    return re.compile('^xattr-{}.*\\.(exe|whl)$'.format(re.escape(version)))
 
 def sign_artifacts(version):
     artifacts = set(os.listdir('dist'))
