@@ -8,6 +8,11 @@ import xattr
 
 
 class BaseTestXattr(object):
+    # TESTDIR for temporary files usually defaults to "/tmp",
+    # which may not have XATTR support (e.g. tmpfs);
+    # manual override here.
+    TESTDIR = None
+
     def test_attr(self):
         x = xattr.xattr(self.tempfile)
 
@@ -66,15 +71,17 @@ class BaseTestXattr(object):
             self.assertEqual(str(e), msg)
 
     def test_symlink_attrs(self):
-        # Solaris doesn't support extended attributes on symlinks
-        if sys.platform == 'sunos5':
-            return
         symlinkPath = self.tempfilename + '.link'
         os.symlink(self.tempfilename, symlinkPath)
         try:
             symlink = xattr.xattr(symlinkPath, options=xattr.XATTR_NOFOLLOW)
             realfile = xattr.xattr(self.tempfilename)
-            symlink['user.islink'] = b'true'
+            try:
+                symlink['user.islink'] = b'true'
+            except IOError:
+                # Solaris, Linux don't support extended attributes on symlinks
+                raise unittest.SkipTest("XATTRs on symlink not allowed"
+                                        " on filesystem/platform")
             self.assertEqual(dict(realfile), {})
             self.assertEqual(symlink['user.islink'], b'true')
         finally:
@@ -83,7 +90,7 @@ class BaseTestXattr(object):
 
 class TestFile(TestCase, BaseTestXattr):
     def setUp(self):
-        self.tempfile = NamedTemporaryFile()
+        self.tempfile = NamedTemporaryFile(dir=self.TESTDIR)
         self.tempfilename = self.tempfile.name
 
     def tearDown(self):
@@ -92,7 +99,7 @@ class TestFile(TestCase, BaseTestXattr):
 
 class TestDir(TestCase, BaseTestXattr):
     def setUp(self):
-        self.tempfile = mkdtemp()
+        self.tempfile = mkdtemp(dir=self.TESTDIR)
         self.tempfilename = self.tempfile
 
     def tearDown(self):
@@ -107,7 +114,9 @@ except AttributeError:
 else:
     class TestFileWithSurrogates(TestFile):
         def setUp(self):
-            if sys.platform != 'linux':
+            if sys.platform not in ('linux', 'linux2'):
                 raise unittest.SkipTest('Files with invalid encoded names are only supported under linux')
-            self.tempfile = NamedTemporaryFile(prefix=b'invalid-\xe9'.decode('utf8','surrogateescape'))
+            if sys.version_info[0] < 3:
+                raise unittest.SkipTest('Test is only available on Python3') # surrogateescape not avail in py2
+            self.tempfile = NamedTemporaryFile(prefix=b'invalid-\xe9'.decode('utf8','surrogateescape'), dir=self.TESTDIR)
             self.tempfilename = self.tempfile.name

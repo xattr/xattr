@@ -3,7 +3,7 @@
 ##
 # Copyright (c) 2007 Apple Inc.
 #
-# This is the MIT license.  This software may also be distributed under the
+# This is the MIT license. This software may also be distributed under the
 # same terms as Python (the PSF license).
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
@@ -35,6 +35,10 @@ import zlib
 import xattr
 
 
+class NullsInString(Exception):
+    """Nulls in string."""
+
+
 def usage(e=None):
     if e:
         print(e)
@@ -60,10 +64,6 @@ def usage(e=None):
         sys.exit(64)
     else:
         sys.exit(0)
-
-
-class NullsInString(Exception):
-    """Nulls in string."""
 
 
 _FILTER = ''.join([(len(repr(chr(x))) == 3) and chr(x) or '.' for x in range(256)])
@@ -127,7 +127,7 @@ def main():
     if write:
         if not args:
             usage("No attr_value")
-        attr_value = args.pop(0)
+        attr_value = args.pop(0).encode('utf-8')
 
     if len(args) > 1:
         multiple_files = True
@@ -185,13 +185,14 @@ def main():
                         attr_value = decompress(attrs[attr_name])
                     except zlib.error:
                         attr_value = attrs[attr_name]
+                    attr_value = attr_value.decode('utf-8')
                 except KeyError:
                     onError("%sNo such xattr: %s" % (file_prefix, attr_name))
                     continue
 
                 if long_format:
                     try:
-                        if attr_value.find('\0') >= 0:
+                        if '\0' in attr_value:
                             raise NullsInString
                         print("".join((file_prefix, "%s: " % (attr_name,), attr_value)))
                     except (UnicodeDecodeError, NullsInString):
