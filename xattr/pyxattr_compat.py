@@ -8,6 +8,7 @@ This module provides compatibility for the pyxattr API.
 
 import sys
 
+from .compat import (binary_type, integer_types, text_type)
 from .lib import (XATTR_NOFOLLOW, XATTR_CREATE, XATTR_REPLACE,
     XATTR_NOSECURITY, XATTR_MAXNAMELEN, XATTR_FINDERINFO_NAME,
     XATTR_RESOURCEFORK_NAME, _getxattr, _fgetxattr, _setxattr, _fsetxattr,
@@ -29,13 +30,13 @@ _NO_NS = object()
 _fsencoding = sys.getfilesystemencoding()
 
 def _call(item, name_func, fd_func, *args):
-    if isinstance(item, int):
+    if isinstance(item, integer_types):
         return fd_func(item, *args)
     elif hasattr(item, 'fileno'):
         return fd_func(item.fileno(), *args)
-    elif isinstance(item, str):
+    elif isinstance(item, binary_type):
         return name_func(item, *args)
-    elif isinstance(item, unicode):
+    elif isinstance(item, text_type):
         item = item.encode(_fsencoding)
         return name_func(item, *args)
     else:
