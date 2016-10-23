@@ -2,6 +2,7 @@
 /build
 /dist
 /*.egg
+/*.eggs
 *.pyc
 *.so
 .\#*
