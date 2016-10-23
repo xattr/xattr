@@ -4,17 +4,6 @@ import os
 import sys
 
 from setuptools import setup
-from distutils.command.build import build
-
-class cffi_build(build):
-    """This is a shameful hack to ensure that cffi is present when
-    we specify ext_modules. We can't do this eagerly because
-    setup_requires hasn't run yet.
-    """
-    def finalize_options(self):
-        from xattr.lib import ffi
-        self.distribution.ext_modules = [ffi.verifier.get_extension()]
-        build.finalize_options(self)
 
 VERSION = '0.8.0'
 DESCRIPTION = "Python wrapper for extended filesystem attributes"
@@ -60,9 +49,9 @@ setup(
             "xattr = xattr.tool:main",
         ],
     },
-    install_requires=["cffi>=0.4"],
-    setup_requires=["cffi>=0.4"],
+    install_requires=["cffi>=1.0.0"],
+    setup_requires=["cffi>=1.0.0"],
+    cffi_modules=["xattr/lib_build.py:ffi"],
     test_suite="xattr.tests.all_tests_suite",
     zip_safe=False,
-    cmdclass={'build': cffi_build},
 )
