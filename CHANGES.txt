@@ -2,6 +2,10 @@ Version 0.9.0 released XXXX-XX-XX
 
 * Allow (Python 2) long for fd
   https://github.com/xattr/xattr/pull/51
+* Fix Python 3 bytes handling in xattr.tool
+  https://github.com/xattr/xattr/pull/50
+* Use cffi 1.X features to build native module for faster import
+  https://github.com/xattr/xattr/pull/47
 
 Version 0.8.0 released 2016-02-28
 
