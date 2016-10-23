@@ -4,7 +4,7 @@ set -e
 set -x
 
 if [[ -n "$PYENV_VERSION" ]]; then
-    PYENV_ROOT="$HOME/.pyenv"
+    PYENV_ROOT="$HOME/.pyenv-xattr"
     PATH="$PYENV_ROOT/bin:$PATH"
     eval "$(pyenv init -)"
 fi

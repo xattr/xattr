@@ -9,16 +9,16 @@ matrix:
     language: objective-c
   - os: osx
     language: objective-c
-    env: PYENV_VERSION=pypy3-2.4.0
+    env: PYENV_VERSION=pypy3-5.5.0-alpha
   - os: osx
     language: objective-c
-    env: PYENV_VERSION=pypy-4.0.1
+    env: PYENV_VERSION=pypy-5.4.1
   - os: osx
     language: objective-c
-    env: PYENV_VERSION=2.7.11
+    env: PYENV_VERSION=2.7.12
   - os: osx
     language: objective-c
-    env: PYENV_VERSION=3.5.1
+    env: PYENV_VERSION=3.5.2
 install:
 - "./.travis/install.sh"
 script:
