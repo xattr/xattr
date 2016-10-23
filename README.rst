@@ -1,3 +1,9 @@
+xattr
+-----
+
+.. image:: https://travis-ci.org/xattr/xattr.svg?branch=master
+    :target: https://travis-ci.org/xattr/xattr
+
 xattr is a Python wrapper for extended filesystem attributes.
 
 Extended attributes extend the basic attributes of files and directories
