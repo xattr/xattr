@@ -24,6 +24,10 @@ class BaseTestXattr(object):
             d['SUNWattr_ro'] = x['SUNWattr_ro']
             d['SUNWattr_rw'] = x['SUNWattr_rw']
 
+        # SELinux systems use an attribute which must be accounted for
+        if sys.platform.startswith('linux') and 'security.selinux' in x:
+            d['security.selinux'] = x['security.selinux']
+
         self.assertEqual(list(x.keys()), list(d.keys()))
         self.assertEqual(list(x.list()), list(d.keys()))
         self.assertEqual(dict(x), d)
