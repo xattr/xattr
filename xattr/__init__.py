@@ -85,7 +85,6 @@ class xattr(object):
         See x-man-page://2/removexattr for options and possible errors.
         """
         return self._call(_removexattr, _fremovexattr, name, options | self.options)
-        self._remove(name, options | self.options)
 
     def list(self, options=0):
         """
