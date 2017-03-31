@@ -60,7 +60,7 @@ static void convert_bsd_list(char *namebuf, size_t size)
 {
     size_t offset = 0;
     while(offset < size) {
-        int length = (int) namebuf[offset];
+        int length = (int) (unsigned char)namebuf[offset];
         memmove(namebuf+offset, namebuf+offset+1, length);
         namebuf[offset+length] = '\\0';
         offset += length+1;
