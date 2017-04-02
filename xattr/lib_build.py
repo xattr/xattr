@@ -52,15 +52,13 @@ C_SRC = """
 #define XATTR_REPLACE 0x2
 
 /* Converts a freebsd format attribute list into a NULL terminated list.
- * While the man page on extattr_list_file says it is NULL terminated,
- * it is actually the first byte that is the length of the
- * following attribute.
+ * The first byte is the length of the following attribute.
  */
 static void convert_bsd_list(char *namebuf, size_t size)
 {
     size_t offset = 0;
     while(offset < size) {
-        int length = (int) namebuf[offset];
+        int length = (int) (unsigned char)namebuf[offset];
         memmove(namebuf+offset, namebuf+offset+1, length);
         namebuf[offset+length] = '\\0';
         offset += length+1;
