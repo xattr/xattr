@@ -7,7 +7,7 @@ The xattr type wraps a path or file descriptor with a dict-like interface
 that exposes these extended attributes.
 """
 
-__version__ = '0.9.1'
+__version__ = '0.9.2'
 
 from .compat import integer_types
 from .lib import (XATTR_NOFOLLOW, XATTR_CREATE, XATTR_REPLACE,

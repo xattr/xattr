@@ -23,20 +23,6 @@ def download_file(src_url, dest_path):
         ['curl', '-L', '-#', '-o', dest_path, src_url])
 
 
-def download_appveyor_artifacts():
-    api_url = 'https://ci.appveyor.com/api'
-    builds = get_json(
-        '{}/projects/etrepum/xattr'.format(api_url))
-
-    for job in builds['build']['jobs']:
-        url = '{api_url}/buildjobs/{jobId}/artifacts'.format(
-            api_url=api_url, **job)
-        for artifact in get_json(url):
-            download_file(
-                '{url}/{fileName}'.format(url=url, **artifact),
-                artifact['fileName'])
-
-
 def download_github_artifacts():
     release = get_json(
         'https://api.github.com/repos/xattr/xattr/releases/latest')
@@ -71,7 +57,6 @@ def upload_artifacts(version):
     subprocess.check_call(args)
 
 def main():
-    # download_appveyor_artifacts()
     download_github_artifacts()
     version = get_version()
     sign_artifacts(version)
