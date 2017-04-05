@@ -122,6 +122,11 @@ def main():
     if read or write or delete:
         if not args:
             usage("No attr_name")
+        # Doublecheck prefixes
+        ok_prefixes = ["user", "system", "trusted", "security"]
+        split = args[1].split('.')
+        if len(split) < 2 and split[0] not in ok_prefixes:
+            usage("Name must start with \"{0}.\"".format(ok_prefixes))
         attr_name = args.pop(0)
 
     if write:
