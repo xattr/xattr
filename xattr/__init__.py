@@ -95,7 +95,7 @@ class xattr(object):
         """
         res = self._call(_listxattr, _flistxattr, options | self.options).split(b'\x00')
         res.pop()
-        return [s.decode('utf-8') for s in res]
+        return res
 
     # dict-like methods
 
@@ -160,30 +160,45 @@ class xattr(object):
             yield v
 
     def values(self):
-        return list(self.itervalues())
+        return [x for x in self.itervalues()]
 
-    def iteritems(self):
-        for k in self.list():
+    def iteritems(self, options=0):
+        for k in self.list(options=options):
             yield k, self.get(k)
 
-    def items(self):
-        return list(self.iteritems())
+    def items(self, options=0):
+        return [x for x in self.iteritems(options=options)]
 
 
-def listxattr(f, symlink=False):
+def listxattr(f, symlink=False, nofollow=False):
+    symlink = symlink or nofollow
     return tuple(xattr(f).list(options=symlink and XATTR_NOFOLLOW or 0))
 
 
-def getxattr(f, attr, symlink=False):
+def getxattr(f, attr, symlink=False, nofollow=False):
+    symlink = symlink or nofollow
     return xattr(f).get(attr, options=symlink and XATTR_NOFOLLOW or 0)
 
 
-def setxattr(f, attr, value, options=0, symlink=False):
-    if symlink:
+def get_all(f, symlink=False, nofollow=False):
+    symlink = symlink or nofollow
+    options = symlink and XATTR_NOFOLLOW or 0
+    return xattr(f).items(options=options)
+
+
+def setxattr(f, attr, value, options=0, symlink=False, nofollow=False):
+    if symlink or nofollow:
         options |= XATTR_NOFOLLOW
     return xattr(f).set(attr, value, options=options)
 
 
-def removexattr(f, attr, symlink=False):
+def removexattr(f, attr, symlink=False, nofollow=False):
+    symlink = symlink or nofollow
     options = symlink and XATTR_NOFOLLOW or 0
     return xattr(f).remove(attr, options=options)
+
+# aliases for compatibility with pyxattr
+get = getxattr
+set = setxattr
+remove = removexattr
+list = listxattr
