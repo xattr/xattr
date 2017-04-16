@@ -160,30 +160,49 @@ class xattr(object):
             yield v
 
     def values(self):
-        return list(self.itervalues())
+        return _pylist(self.itervalues())
 
-    def iteritems(self):
-        for k in self.list():
+    def iteritems(self, options=0):
+        for k in self.list(options=options):
             yield k, self.get(k)
 
-    def items(self):
-        return list(self.iteritems())
+    def items(self, options=0):
+        return _pylist(self.iteritems(options=options))
 
 
-def listxattr(f, symlink=False):
+def listxattr(f, symlink=False, nofollow=False):
+    symlink = symlink or nofollow
     return tuple(xattr(f).list(options=symlink and XATTR_NOFOLLOW or 0))
 
 
-def getxattr(f, attr, symlink=False):
+def getxattr(f, attr, symlink=False, nofollow=False):
+    symlink = symlink or nofollow
     return xattr(f).get(attr, options=symlink and XATTR_NOFOLLOW or 0)
 
+get = getxattr
 
-def setxattr(f, attr, value, options=0, symlink=False):
-    if symlink:
+def get_all(f, symlink=False, nofollow=False):
+    symlink = symlink or nofollow
+    options = symlink and XATTR_NOFOLLOW or 0
+    return xattr(f).items(options=options)
+
+# XXX: This is really ugly - now we cannot use the standard python
+#      list() anymore in this module!
+_pylist = list
+def list(f, symlink=False, nofollow=False):
+    symlink = symlink or nofollow
+    return xattr(f).list(options=symlink and XATTR_NOFOLLOW or 0)
+
+def setxattr(f, attr, value, options=0, symlink=False, nofollow=False):
+    if symlink or nofollow:
         options |= XATTR_NOFOLLOW
     return xattr(f).set(attr, value, options=options)
 
+set = setxattr
 
-def removexattr(f, attr, symlink=False):
+def removexattr(f, attr, symlink=False, nofollow=False):
+    symlink = symlink or nofollow
     options = symlink and XATTR_NOFOLLOW or 0
     return xattr(f).remove(attr, options=options)
+
+remove = removexattr
