@@ -45,10 +45,10 @@ def usage(e=None):
         print("")
 
     name = os.path.basename(sys.argv[0])
-    print("usage: %s [-lz] file [file ...]" % (name,))
-    print("       %s -p [-lz] attr_name file [file ...]" % (name,))
-    print("       %s -w [-z] attr_name attr_value file [file ...]" % (name,))
-    print("       %s -d attr_name file [file ...]" % (name,))
+    print("usage: %s [-slz] file [file ...]" % (name,))
+    print("       %s -p [-slz] attr_name file [file ...]" % (name,))
+    print("       %s -w [-sz] attr_name attr_value file [file ...]" % (name,))
+    print("       %s -d [-s] attr_name file [file ...]" % (name,))
     print("")
     print("The first form lists the names of all xattrs on the given file(s).")
     print("The second form (-p) prints the value of the xattr attr_name.")
@@ -57,6 +57,7 @@ def usage(e=None):
     print("")
     print("options:")
     print("  -h: print this help")
+    print("  -s: act on symbolic links themselves rather than their targets")
     print("  -l: print long format (attr_name: attr_value)")
     print("  -z: compress or decompress (if compressed) attribute value in zip format")
 
@@ -81,7 +82,7 @@ def _dump(src, length=16):
 
 def main():
     try:
-        (optargs, args) = getopt.getopt(sys.argv[1:], "hlpwdz", ["help"])
+        (optargs, args) = getopt.getopt(sys.argv[1:], "hlpwdzs", ["help"])
     except getopt.GetoptError as e:
         usage(e)
 
@@ -90,6 +91,7 @@ def main():
     read = False
     write = False
     delete = False
+    nofollow = False
     compress = lambda x: x
     decompress = compress
     status = 0
@@ -99,6 +101,8 @@ def main():
             usage()
         elif opt == "-l":
             long_format = True
+        elif opt == "-s":
+            nofollow = True
         elif opt == "-p":
             read = True
             if write or delete:
@@ -134,6 +138,10 @@ def main():
     else:
         multiple_files = False
 
+    options = 0
+    if nofollow:
+        options |= xattr.XATTR_NOFOLLOW
+
     for filename in args:
         def onError(e):
             if not os.path.exists(filename):
@@ -142,7 +150,7 @@ def main():
                 sys.stderr.write(str(e) + "\n")
 
         try:
-            attrs = xattr.xattr(filename)
+            attrs = xattr.xattr(filename, options=options)
         except (IOError, OSError) as e:
             onError(e)
             continue
