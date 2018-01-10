@@ -7,6 +7,7 @@ matrix:
   include:
   - os: osx
     language: objective-c
+    env: BUILD_SDIST=true
   - os: osx
     language: objective-c
     env: PYENV_VERSION=pypy3.5-5.10.0
@@ -30,7 +31,9 @@ deploy:
   provider: releases
   api_key:
     secure: Z5m7K1UVq0812nNtR+QAkUE3lxUwhMjM3EDWUOyPmfh0rmOsU2RgQ8oBfT1vatYfY8ExnrG4rRNWmwUqPEIzZmRLmw9zv+ixA3gcVPn6WbbMkwoeIurOPsC9wjgCckDFKYhMda8a92FSL2hVto3JPcRNTZnsKBR35Queray55SM=
-  file: dist/*.whl
+  file:
+    - dist/*.whl
+    - dist/*.tar.gz
   file_glob: true
   on:
     repo: xattr/xattr
