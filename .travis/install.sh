@@ -12,6 +12,7 @@ if [[ -n "$PYENV_VERSION" ]]; then
     fi
     PYENV_ROOT="$HOME/.pyenv-xattr"
     PATH="$PYENV_ROOT/bin:$PATH"
+    (cd "$PYENV_ROOT" && git fetch origin && git reset --hard origin/master)
     hash -r
     eval "$(pyenv init -)"
     hash -r
