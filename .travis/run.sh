@@ -5,9 +5,10 @@ set -x
 
 if [[ -n "$PYENV_VERSION" ]]; then
     PYENV_ROOT="$HOME/.pyenv-xattr"
+    PYENV="$PYENV_ROOT/bin/pyenv"
     PATH="$PYENV_ROOT/bin:$PATH"
     hash -r
-    eval "$(pyenv init -)"
+    eval "$("$PYENV" init -)"
 fi
 
 python setup.py build_ext -i

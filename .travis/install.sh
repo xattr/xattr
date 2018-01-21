@@ -11,12 +11,13 @@ if [[ -n "$PYENV_VERSION" ]]; then
       git clone https://github.com/yyuu/pyenv.git ~/.pyenv-xattr
     fi
     PYENV_ROOT="$HOME/.pyenv-xattr"
+    PYENV="$PYENV_ROOT/bin/pyenv"
     PATH="$PYENV_ROOT/bin:$PATH"
     (cd "$PYENV_ROOT" && git fetch origin && git reset --hard origin/master)
     hash -r
-    eval "$(pyenv init -)"
+    eval "$("$PYENV" init -)"
     hash -r
-    pyenv install --list
-    pyenv install -s $PYENV_VERSION
+    "$PYENV" install --list
+    "$PYENV" install -s "$PYENV_VERSION"
     pip install wheel
 fi
