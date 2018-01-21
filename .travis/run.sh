@@ -4,11 +4,7 @@ set -e
 set -x
 
 if [[ -n "$PYENV_VERSION" ]]; then
-    PYENV_ROOT="$HOME/.pyenv-xattr"
-    PYENV="$PYENV_ROOT/bin/pyenv"
-    PATH="$PYENV_ROOT/bin:$PATH"
-    hash -r
-    eval "$("$PYENV" init -)"
+    eval "$(pyenv init -)"
 fi
 
 python setup.py build_ext -i
@@ -16,7 +12,7 @@ python -m compileall -f .
 python setup.py test
 
 if [[ -n "$PYENV_VERSION" && $TRAVIS_OS_NAME == 'osx' ]]; then
-  python setup.py bdist_wheel
+    python setup.py bdist_wheel
 fi
 if [[ $BUILD_SDIST == 'true' ]]; then
     python setup.py sdist
