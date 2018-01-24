@@ -13,9 +13,5 @@ if [[ -n "$PYENV_VERSION" ]]; then
     pyenv install --list
     pyenv install -s "$PYENV_VERSION"
     pyenv rehash
-    which pip &> /dev/null || \
-      python -m pip install --upgrade pip || \
-      (curl -O https://bootstrap.pypa.io/get-pip.py && python get-pip.py && rm get-pip.py)
-    pyenv rehash
-    pip install wheel
+    python -m pip install wheel
 fi
