@@ -13,9 +13,6 @@ matrix:
     env: PYENV_VERSION=pypy3.5-5.10.0
   - os: osx
     language: objective-c
-    env: PYENV_VERSION=pypy2.7-5.10.0-src
-  - os: osx
-    language: objective-c
     env: PYENV_VERSION=2.7.14
   - os: osx
     language: objective-c
