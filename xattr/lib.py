@@ -1,7 +1,7 @@
 import os
 import sys
 
-import .compat import fs_encode
+from .compat import fs_encode
 
 try:
     from ._lib import lib, ffi
