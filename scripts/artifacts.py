@@ -26,11 +26,14 @@ def download_github_artifacts():
 
 
 def get_version():
-    return subprocess.check_output([sys.executable, 'setup.py', '--version']).strip()
+    return subprocess.check_output(
+        [sys.executable, 'setup.py', '--version'],
+        encoding='utf8'
+    ).strip()
 
 
 def artifact_matcher(version):
-    prefix = 'simplejson-{}'.format(version)
+    prefix = 'xattr-{}'.format(version)
     def matches(fn):
         return (
             fn.startswith(prefix) and
@@ -44,8 +47,8 @@ def sign_artifacts(version):
     artifacts = set(os.listdir('dist'))
     matches = artifact_matcher(version)
     passphrase = getpass.getpass('\nGPG Passphrase:')
-    for fn in artifacts:
-        if matches(fn) and '{}.asc'.format(fn) not in artifacts:
+    for fn in filter(matches, artifacts):
+        if '{}.asc'.format(fn) not in artifacts:
             sign_artifact(os.path.join('dist', fn), passphrase)
 
 
@@ -58,19 +61,18 @@ def sign_artifact(path, passphrase):
         '--armor',
         path
     ]
-    print(' '.join(cmd))
     subprocess.run(cmd, check=True, input=passphrase, encoding='utf8')
 
 
 def upload_artifacts(version):
     artifacts = set(os.listdir('dist'))
-    pattern = artifact_matcher(version)
+    matches = artifact_matcher(version)
     args = ['twine', 'upload']
-    for fn in artifacts:
-        if pattern.search(fn):
-            filename = os.path.join('dist', fn)
-            args.extend([filename, filename + '.asc'])
+    for fn in filter(matches, artifacts):
+        filename = os.path.join('dist', fn)
+        args.extend([filename, filename + '.asc'])
     subprocess.check_call(args)
+
 
 def main():
     try:
