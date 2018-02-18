@@ -13,7 +13,22 @@ class BaseTestXattr(object):
     # manual override here.
     TESTDIR = None
 
-    def test_attr(self):
+    def test_attr_fs_encoding_unicode(self):
+        # Not using setlocale(LC_ALL, ..) to set locale because
+        # sys.getfilesystemencoding() implementation falls back
+        # to user's preferred locale by calling setlocale(LC_ALL, '').
+        xattr.compat.fs_encoding = 'UTF-8'
+        self._test_attr()
+
+    def test_attr_fs_encoding_ascii(self):
+        xattr.compat.fs_encoding = 'US-ASCII'
+        if sys.version_info[0] < 3:
+            with self.assertRaises(UnicodeEncodeError):
+                self._test_attr()
+        else:
+            self._test_attr()
+
+    def _test_attr(self):
         x = xattr.xattr(self.tempfile)
 
         # Solaris 11 and forward contain system attributes (file flags) in
