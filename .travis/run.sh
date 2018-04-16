@@ -6,7 +6,7 @@ set -x
 if [[ -n "$PYENV_VERSION" ]]; then
     eval "$(pyenv init -)"
 fi
-
+python -m pip install pip==9.0.3
 python setup.py build_ext -i
 python -m compileall -f .
 python setup.py test
