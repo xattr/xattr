@@ -16,6 +16,6 @@ if [[ -n "$PYENV_VERSION" ]]; then
         pyenv install -s "$PYENV_VERSION"
     fi
     pyenv rehash
-    python -m pip install "pip==9.0.3"
+    python -m pip install pip==9.0.3
     python -m pip install wheel
 fi
