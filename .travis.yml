@@ -8,18 +8,23 @@ matrix:
   - os: osx
     language: objective-c
     env: BUILD_SDIST=true
+    osx_image: xcode_9.4
   - os: osx
     language: objective-c
-    env: PYENV_VERSION=pypy3.5-5.10.0
+    env: PYENV_VERSION=pypy3.5-6.0.0
+    osx_image: xcode_9.4
   - os: osx
     language: objective-c
-    env: PYENV_VERSION=2.7.14
+    env: PYENV_VERSION=2.7.15
+    osx_image: xcode_9.4
   - os: osx
     language: objective-c
-    env: PYENV_VERSION=3.5.4
+    env: PYENV_VERSION=3.6.6
+    osx_image: xcode_9.4
   - os: osx
     language: objective-c
-    env: PYENV_VERSION=3.6.4
+    env: PYENV_VERSION=3.7.0
+    osx_image: xcode_9.4
 install:
 - "./.travis/install.sh"
 script:
