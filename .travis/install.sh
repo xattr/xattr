@@ -14,7 +14,6 @@ if [[ -n "$PYENV_VERSION" ]]; then
     pyenv install --list
     if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
         CFLAGS="-I$(xcrun --show-sdk-path)/usr/include /usr/local/opt/expat/include $CFLAGS" \
-        LDFLAGS="-L$(xcrun --show-sdk-path)/usr/lib /usr/local/opt/expat/lib $LDFLAGS" \
         pyenv install -s "$PYENV_VERSION"
     else
         pyenv install -s "$PYENV_VERSION"
