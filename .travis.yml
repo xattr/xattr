@@ -6,24 +6,20 @@ cache:
 matrix:
   include:
   - os: osx
-    language: objective-c
-    env: BUILD_SDIST=true
+    language: generic
+    env: PYENV_VERSION=3.7.0 BUILD_SDIST=true
     osx_image: xcode_9.4
   - os: osx
-    language: objective-c
-    env: PYENV_VERSION=pypy3.5-6.0.0
-    osx_image: xcode_9.4
-  - os: osx
-    language: objective-c
+    language: generic
     env: PYENV_VERSION=2.7.15
     osx_image: xcode_9.4
   - os: osx
-    language: objective-c
-    env: PYENV_VERSION=3.6.6
+    language: generic
+    env: PYENV_VERSION=3.6.5
     osx_image: xcode_9.4
   - os: osx
-    language: objective-c
-    env: PYENV_VERSION=3.7.0
+    language: generic
+    env: PYENV_VERSION=pypy3.5-6.0.0-src
     osx_image: xcode_9.4
 install:
 - "./.travis/install.sh"
