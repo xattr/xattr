@@ -7,7 +7,7 @@ matrix:
   include:
   - os: osx
     language: generic
-    env: PYENV_VERSION=3.7.0 BUILD_SDIST=true
+    env: PYENV_VERSION=3.7.0
     osx_image: xcode_9.4
   - os: osx
     language: generic
