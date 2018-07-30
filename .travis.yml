@@ -5,21 +5,22 @@ cache:
   - "$HOME/.pyenv"
 matrix:
   include:
-  - os: osx
+  # Travis Python images not working properly with OSX - see https://github.com/travis-ci/travis-ci/issues/9744.
+  # Have to rely on pyenv.
+  - name: "Python: 3.7 OSX"
+    os: osx
     language: generic
-    env: PYENV_VERSION=3.7.0
+    env: PYENV_VERSION=3.7.0 BUILD_SDIST=true
     osx_image: xcode_9.4
-  - os: osx
-    language: generic
-    env: PYENV_VERSION=2.7.15
-    osx_image: xcode_9.4
-  - os: osx
+  - name: "Python: 3.6 OSX"
+    os: osx
     language: generic
     env: PYENV_VERSION=3.6.5
     osx_image: xcode_9.4
-  - os: osx
+  - name: "Python: 2.7 OSX"
+    os: osx
     language: generic
-    env: PYENV_VERSION=pypy3.5-6.0.0-src
+    env: PYENV_VERSION=2.7.15
     osx_image: xcode_9.4
 install:
 - "./.travis/install.sh"
