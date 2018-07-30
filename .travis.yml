@@ -22,7 +22,7 @@ matrix:
   - name: "Python: 3.7 OSX"
     os: osx
     language: generic
-    env: PYENV_VERSION=3.7.0 BUILD_SDIST=true
+    env: PYENV_VERSION=3.7.0
     osx_image: xcode_9.4
   - name: "Python: 3.6 OSX"
     os: osx
