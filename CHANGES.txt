@@ -1,3 +1,12 @@
+Version 0.9.4 released 2018-07-30
+
+* Extract inline C code for syntax highlighting and easier maintenance
+  https://github.com/xattr/xattr/pull/75
+* Fix Travis build
+  https://github.com/xattr/xattr/pull/74
+* Always include sys/types.h (musl compatibility)
+  https://github.com/xattr/xattr/pull/73
+
 Version 0.9.3 released 2018-01-28
 
 * Do not attempt to use surrogateescape unless it is available
