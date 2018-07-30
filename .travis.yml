@@ -5,21 +5,37 @@ cache:
   - "$HOME/.pyenv"
 matrix:
   include:
-  - os: osx
+  - name: "Ubuntu: 3.6"
+    os: linux
+    python: 3.6
+  - name: "Ubuntu: 3.5"
+    os: linux
+    python: 3.5
+  - name: "Ubuntu: 2.7"
+    os: linux
+    python: 2.7
+  - name: "Ubuntu: PyPy 3.5"
+    os: linux
+    env: PYPY_URL=https://bitbucket.org/pypy/pypy/downloads/pypy3-v6.0.0-linux64.tar.bz2
+  - name: "Ubuntu: PyPy 2.7"
+    os: linux
+    env: PYPY_URL=https://bitbucket.org/pypy/pypy/downloads/pypy2-v6.0.0-linux64.tar.bz2
+  # Travis Python images are broken in OSX - see https://github.com/travis-ci/travis-ci/issues/9744.
+  # Will have to rely on pyenv until the issue is fixed.
+  - name: "OSX: 3.7"
+    os: osx
     language: generic
-    env: PYENV_VERSION=3.7.0 BUILD_SDIST=true
+    env: PYENV_VERSION=3.7.0
     osx_image: xcode_9.4
-  - os: osx
-    language: generic
-    env: PYENV_VERSION=2.7.15
-    osx_image: xcode_9.4
-  - os: osx
+  - name: "OSX: 3.6"
+    os: osx
     language: generic
     env: PYENV_VERSION=3.6.5
     osx_image: xcode_9.4
-  - os: osx
+  - name: "OSX: 2.7"
+    os: osx
     language: generic
-    env: PYENV_VERSION=pypy3.5-6.0.0-src
+    env: PYENV_VERSION=2.7.15
     osx_image: xcode_9.4
 install:
 - "./.travis/install.sh"

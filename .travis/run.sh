@@ -7,9 +7,15 @@ if [[ -n "$PYENV_VERSION" ]]; then
     eval "$(pyenv init -)"
 fi
 
-python setup.py build_ext -i
-python -m compileall -f .
-python setup.py test
+if [[ -n "$PYPY_URL" ]]; then
+    cmd=./pypy
+else
+    cmd=python
+fi
+
+"$cmd" setup.py build_ext -i
+"$cmd" -m compileall -f .
+"$cmd" setup.py test
 
 if [[ -n "$PYENV_VERSION" && $TRAVIS_OS_NAME == 'osx' ]]; then
     python setup.py bdist_wheel
