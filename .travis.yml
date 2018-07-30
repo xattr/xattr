@@ -5,6 +5,18 @@ cache:
   - "$HOME/.pyenv"
 matrix:
   include:
+  - os: linux
+    python: 3.6
+  - os: linux
+    python: 3.5
+  - os: linux
+    python: 2.7
+  - name: "PyPy: 3.5"
+    os: linux
+    env: PYPY_URL=https://bitbucket.org/pypy/pypy/downloads/pypy3-v6.0.0-linux64.tar.bz2
+  - name: "PyPy: 2.7"
+    os: linux
+    env: PYPY_URL=https://bitbucket.org/pypy/pypy/downloads/pypy2-v6.0.0-linux64.tar.bz2
   # Travis Python images not working properly with OSX - see https://github.com/travis-ci/travis-ci/issues/9744.
   # Have to rely on pyenv.
   - name: "Python: 3.7 OSX"
