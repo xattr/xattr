@@ -6,8 +6,8 @@ from .compat import fs_encode
 try:
     from ._lib import lib, ffi
 except ImportError:
-    from .lib_build import ffi, C_SRC
-    lib = ffi.verify(C_SRC)
+    from .lib_build import ffi, c_source
+    lib = ffi.verify(c_source)
 
 XATTR_NOFOLLOW = lib.XATTR_XATTR_NOFOLLOW
 XATTR_CREATE = lib.XATTR_XATTR_CREATE
