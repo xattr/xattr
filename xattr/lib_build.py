@@ -27,10 +27,10 @@ ssize_t xattr_flistxattr(int, char *, size_t, int);
 
 C_SRC = """
 #include "Python.h"
+#include <sys/types.h>
 #ifdef __FreeBSD__
 #include <sys/extattr.h>
 #elif defined(__SUN__) || defined(__sun__) || defined(__sun)
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
