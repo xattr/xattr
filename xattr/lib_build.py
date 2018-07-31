@@ -9,7 +9,6 @@ platforms = {
     'sunos': 'xattr_sunos.c'
 }
 
-source_dir = os.path.join(os.path.dirname(__file__), 'lib_src')
 source_file = None
 sys_platform = sys.platform.lower()
 for platform in platforms:
@@ -19,6 +18,7 @@ if not source_file:
     print('Error: Platform `%s` is not supported.' % sys_platform)
     sys.exit(1)
 
+source_dir = os.path.join(os.path.dirname(__file__), 'lib_src')
 with open(os.path.join(source_dir, 'xattr.h')) as hf:
     c_header = hf.read()
 with open(os.path.join(source_dir, source_file)) as cf:
