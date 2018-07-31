@@ -1,4 +1,6 @@
 include *.py
+include xattr/lib_src/*.c
+include xattr/lib_src/*.h
 include *.txt
 include MANIFEST.in
 include xattr/tests/*.py
