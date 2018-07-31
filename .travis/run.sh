@@ -17,10 +17,10 @@ fi
 "$cmd" -m compileall -f .
 "$cmd" setup.py test
 
-if [[ -n "$PYENV_VERSION" && $TRAVIS_OS_NAME == 'osx' ]]; then
+if [[ -n "$PYENV_VERSION" && "$TRAVIS_OS_NAME" == 'osx' ]]; then
     python setup.py bdist_wheel
 fi
-if [[ $BUILD_SDIST == 'true' ]]; then
+if [[ "$BUILD_SDIST" == 'true' ]]; then
     python setup.py sdist
     mkdir -p tmp-build
     cd tmp-build
