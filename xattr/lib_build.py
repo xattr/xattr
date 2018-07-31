@@ -2,11 +2,23 @@ import sys
 import os
 from cffi import FFI
 
-PATH = os.path.dirname(__file__)
+platforms = {
+    'linux': 'xattr_linux.c',
+    'darwin': 'xattr_darwin.c',
+    'freebsd': 'xattr_freebsd.c',
+    'sunos': 'xattr_sun.c'
+}
+source_dir = os.path.join(os.path.dirname(__file__), 'lib_src')
+source_file = None
 
-with open(os.path.join(PATH, 'lib_build.h')) as hf:
+sys_platform = sys.platform
+for platform in platforms:
+    if platform in sys_platform:
+        source_file = platforms[platform]
+
+with open(os.path.join(source_dir, 'xattr.h')) as hf:
     c_header = hf.read()
-with open(os.path.join(PATH, 'lib_build.c')) as cf:
+with open(os.path.join(source_dir, source_file)) as cf:
     c_source = cf.read()
 
 ffi = FFI()
