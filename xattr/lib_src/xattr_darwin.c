@@ -2,7 +2,6 @@
  * OSX compatibility API.
  */
 
-#include "Python.h"
 #include <sys/types.h>
 #include <sys/xattr.h>
 
