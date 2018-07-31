@@ -16,7 +16,7 @@ for platform in platforms:
     if platform in sys_platform:
         source_file = platforms[platform]
 if not source_file:
-    print("Error: Platform `%s` is not supported." % sys_platform)
+    print('Error: Platform `%s` is not supported.' % sys_platform)
     sys.exit(1)
 
 with open(os.path.join(source_dir, 'xattr.h')) as hf:
