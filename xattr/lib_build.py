@@ -11,7 +11,7 @@ platforms = {
 source_dir = os.path.join(os.path.dirname(__file__), 'lib_src')
 source_file = None
 
-sys_platform = sys.platform
+sys_platform = sys.platform.lower()
 for platform in platforms:
     if platform in sys_platform:
         source_file = platforms[platform]
