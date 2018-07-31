@@ -20,6 +20,9 @@ fi
 if [[ -n "$PYENV_VERSION" && $TRAVIS_OS_NAME == 'osx' ]]; then
     python setup.py bdist_wheel
 fi
-if [[ $BUILD_SDIST == 'true' ]]; then
-    python setup.py sdist
+if [[ "$BUILD_SDIST" == 'true' ]]; then
+    "$cmd" setup.py sdist --formats=gztar
+    # Ensure the package installs from tarball correctly.
+    filename=$("$cmd" setup.py --fullname)
+    pip install "dist/$filename.tar.gz"
 fi
