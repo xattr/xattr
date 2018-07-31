@@ -6,7 +6,7 @@ platforms = {
     'linux': 'xattr_linux.c',
     'darwin': 'xattr_darwin.c',
     'freebsd': 'xattr_freebsd.c',
-    'sunos': 'xattr_sun.c'
+    'sunos': 'xattr_sunos.c'
 }
 source_dir = os.path.join(os.path.dirname(__file__), 'lib_src')
 source_file = None
