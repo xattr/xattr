@@ -8,13 +8,16 @@ platforms = {
     'freebsd': 'xattr_freebsd.c',
     'sunos': 'xattr_sunos.c'
 }
+
 source_dir = os.path.join(os.path.dirname(__file__), 'lib_src')
 source_file = None
-
 sys_platform = sys.platform.lower()
 for platform in platforms:
     if platform in sys_platform:
         source_file = platforms[platform]
+if not source_file:
+    print("Error: Platform `%s` is not supported." % sys_platform)
+    sys.exit(1)
 
 with open(os.path.join(source_dir, 'xattr.h')) as hf:
     c_header = hf.read()
