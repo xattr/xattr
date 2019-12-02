@@ -5,40 +5,38 @@ cache:
   - "$HOME/.pyenv"
 matrix:
   include:
-  - name: "Ubuntu: 3.8"
+  - name: 'Ubuntu: 3.8'
     os: linux
     python: 3.8
-  - name: "Ubuntu: 3.7"
+  - name: 'Ubuntu: 3.7'
     os: linux
     python: 3.7
-  - name: "Ubuntu: 3.6"
+  - name: 'Ubuntu: 3.6'
     os: linux
     python: 3.6
-  - name: "Ubuntu: 3.5"
+  - name: 'Ubuntu: 3.5'
     os: linux
     python: 3.5
-  - name: "Ubuntu: 2.7"
+  - name: 'Ubuntu: 2.7'
     os: linux
     python: 2.7
-  - name: "Ubuntu: PyPy 3.5"
+  - name: 'Ubuntu: PyPy 3.5'
     os: linux
     env: PYPY_URL=https://bitbucket.org/pypy/pypy/downloads/pypy3-v6.0.0-linux64.tar.bz2
-  - name: "Ubuntu: PyPy 2.7"
+  - name: 'Ubuntu: PyPy 2.7'
     os: linux
     env: PYPY_URL=https://bitbucket.org/pypy/pypy/downloads/pypy2-v6.0.0-linux64.tar.bz2
-  # Travis Python images are broken in OSX - see https://github.com/travis-ci/travis-ci/issues/9744.
-  # Will have to rely on pyenv until the issue is fixed.
-  - name: "OSX: 3.7"
+  - name: 'OSX: 3.7'
     os: osx
     language: generic
     env: PYENV_VERSION=3.7.4 BUILD_SDIST=true
     osx_image: xcode_9.4
-  - name: "OSX: 3.6"
+  - name: 'OSX: 3.6'
     os: osx
     language: generic
     env: PYENV_VERSION=3.6.5
     osx_image: xcode_9.4
-  - name: "OSX: 2.7"
+  - name: 'OSX: 2.7'
     os: osx
     language: generic
     env: PYENV_VERSION=2.7.15
@@ -50,10 +48,10 @@ script:
 deploy:
   provider: releases
   api_key:
-    secure: Z5m7K1UVq0812nNtR+QAkUE3lxUwhMjM3EDWUOyPmfh0rmOsU2RgQ8oBfT1vatYfY8ExnrG4rRNWmwUqPEIzZmRLmw9zv+ixA3gcVPn6WbbMkwoeIurOPsC9wjgCckDFKYhMda8a92FSL2hVto3JPcRNTZnsKBR35Queray55SM=
+    secure: e3XKNlhAMNdtnPak4+hUUxUvODo3bnOxQBO0dn6ZoPYuXxot4WVu7O/8Kx1sk+ruVYtAOrVemge5YZvLURMyEmBPVZo1Ks6Xev3wYvLYAYylql5t+iBmsngWX6zPWqls38JO7fnnbK9YwNLxJ3GGYXubQkpCnQJNf4EBh35l0sQ=
   file:
-    - dist/*.whl
-    - dist/*.tar.gz
+  - dist/*.whl
+  - dist/*.tar.gz
   file_glob: true
   on:
     repo: xattr/xattr
