@@ -5,6 +5,12 @@ cache:
   - "$HOME/.pyenv"
 matrix:
   include:
+  - name: "Ubuntu: 3.8"
+    os: linux
+    python: 3.8
+  - name: "Ubuntu: 3.7"
+    os: linux
+    python: 3.7
   - name: "Ubuntu: 3.6"
     os: linux
     python: 3.6
@@ -25,7 +31,7 @@ matrix:
   - name: "OSX: 3.7"
     os: osx
     language: generic
-    env: PYENV_VERSION=3.7.0 BUILD_SDIST=true
+    env: PYENV_VERSION=3.7.4 BUILD_SDIST=true
     osx_image: xcode_9.4
   - name: "OSX: 3.6"
     os: osx

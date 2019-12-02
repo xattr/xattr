@@ -7,7 +7,7 @@ The xattr type wraps a path or file descriptor with a dict-like interface
 that exposes these extended attributes.
 """
 
-__version__ = '0.9.6'
+__version__ = '0.9.7'
 
 from .compat import integer_types
 from .lib import (XATTR_NOFOLLOW, XATTR_CREATE, XATTR_REPLACE,
@@ -137,9 +137,9 @@ class xattr(object):
             del self[k]
 
     def update(self, seq):
-        if not hasattr(seq, 'iteritems'):
+        if not hasattr(seq, 'items'):
             seq = dict(seq)
-        for k, v in seq.iteritems():
+        for k, v in seq.items():
             self[k] = v
 
     def copy(self):
