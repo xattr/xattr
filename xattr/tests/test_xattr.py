@@ -28,6 +28,16 @@ class BaseTestXattr(object):
         else:
             self._test_attr()
 
+    def test_update(self):
+        x = xattr.xattr(self.tempfile)
+        attrs = {
+            'user.test.key1': b'test_value1',
+            'user.test.key2': b'test_value2'
+        }
+        x.update(attrs)
+        for k, v in attrs.items():
+            self.assertEqual(x[k], v)
+
     def _test_attr(self):
         x = xattr.xattr(self.tempfile)
 
