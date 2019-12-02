@@ -48,7 +48,7 @@ script:
 deploy:
   provider: releases
   api_key:
-    secure: e3XKNlhAMNdtnPak4+hUUxUvODo3bnOxQBO0dn6ZoPYuXxot4WVu7O/8Kx1sk+ruVYtAOrVemge5YZvLURMyEmBPVZo1Ks6Xev3wYvLYAYylql5t+iBmsngWX6zPWqls38JO7fnnbK9YwNLxJ3GGYXubQkpCnQJNf4EBh35l0sQ=
+    secure: ik/Btxv+NMOGjKuNnilYSeATYwL7sHy8nildzQcF+GMCFL8mDcerXRoC1jOF+ETsmSOAZ95NOEUGNiyvCApy4VgYvBvz7mJzdaob034+GXOStEIdBBvV8v9XB9XwQpJUUGvRMSF9WMUGmhyQ9PQEPOHfERgLkdlcY24djCJm/6A=
   file:
   - dist/*.whl
   - dist/*.tar.gz
