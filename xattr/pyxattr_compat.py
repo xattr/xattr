@@ -20,10 +20,10 @@ __all__ = [
     "removexattr", "remove", "listxattr", "list"
 ]
 
-NS_SECURITY = "security"
-NS_USER = "user"
-NS_SYSTEM = "system"
-NS_TRUSTED = "trusted"
+NS_SECURITY = b"security"
+NS_USER = b"user"
+NS_SYSTEM = b"system"
+NS_TRUSTED = b"trusted"
 
 _NO_NS = object()
 
@@ -47,7 +47,7 @@ def _add_ns(item, ns):
         raise TypeError("namespace must not be None")
     if ns == _NO_NS:
         return item
-    return "%s.%s" % (ns, item)
+    return b'.'.join((ns, item))
 
 def getxattr(item, attribute, nofollow=False):
     options = nofollow and XATTR_NOFOLLOW or 0
@@ -59,7 +59,7 @@ def get(item, name, nofollow=False, namespace=_NO_NS):
 
 def get_all(item, nofollow=False, namespace=_NO_NS):
     if namespace is not None and namespace != _NO_NS:
-        namespace = '%s.' % namespace
+        namespace += b'.'
     l = listxattr(item, nofollow=nofollow)
     result = []
     for name in l:
@@ -101,7 +101,7 @@ def listxattr(item, nofollow=False):
 def list(item, nofollow=False, namespace=_NO_NS):
     if not namespace or namespace == _NO_NS:
         return listxattr(item, nofollow=nofollow)
-    namespace = "%s." % namespace
+    namespace += b'.'
     l = listxattr(item, nofollow=nofollow)
     result = []
     for name in l:
