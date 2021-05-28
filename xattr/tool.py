@@ -222,10 +222,9 @@ def main():
                 else:
                     if read:
                         if should_dump:
-                            print(file_prefix, end="")
-                            sys.stdout.flush()
-                            with os.fdopen(sys.stdout.fileno(), 'wb', closefd=False) as fp:
-                                fp.write(attr_value.encode('latin-1') + b'\n')
+                            if file_prefix:
+                                print(file_prefix)
+                            print(_dump(attr_value))
                         else:
                             print("".join((file_prefix, attr_value)))
                     else:
