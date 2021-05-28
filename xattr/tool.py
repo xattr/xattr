@@ -195,27 +195,39 @@ def main():
                 file_prefix = ""
 
             for attr_name in attr_names:
+                should_dump = False
                 try:
                     try:
                         attr_value = decompress(attrs[attr_name])
                     except zlib.error:
                         attr_value = attrs[attr_name]
-                    attr_value = attr_value.decode('utf-8')
+                    try:
+                        if b'\0' in attr_value:
+                            # force dumping
+                            raise NullsInString
+                        attr_value = attr_value.decode('utf-8')
+                    except (UnicodeDecodeError, NullsInString):
+                        attr_value = attr_value.decode('latin-1')
+                        should_dump = True
                 except KeyError:
                     onError("%sNo such xattr: %s" % (file_prefix, attr_name))
                     continue
 
                 if long_format:
-                    try:
-                        if '\0' in attr_value:
-                            raise NullsInString
-                        print("".join((file_prefix, "%s: " % (attr_name,), attr_value)))
-                    except (UnicodeDecodeError, NullsInString):
+                    if should_dump:
                         print("".join((file_prefix, "%s:" % (attr_name,))))
                         print(_dump(attr_value))
+                    else:
+                        print("".join((file_prefix, "%s: " % (attr_name,), attr_value)))
                 else:
                     if read:
-                        print("".join((file_prefix, attr_value)))
+                        if should_dump:
+                            print(file_prefix, end="")
+                            sys.stdout.flush()
+                            with os.fdopen(sys.stdout.fileno(), 'wb', closefd=False) as fp:
+                                fp.write(attr_value.encode('latin-1') + b'\n')
+                        else:
+                            print("".join((file_prefix, attr_value)))
                     else:
                         print("".join((file_prefix, attr_name)))
 
