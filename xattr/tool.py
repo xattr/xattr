@@ -49,11 +49,13 @@ def usage(e=None):
     print("       %s -p [-slz] attr_name file [file ...]" % (name,))
     print("       %s -w [-sz] attr_name attr_value file [file ...]" % (name,))
     print("       %s -d [-s] attr_name file [file ...]" % (name,))
+    print("       %s -c [-s] file [file ...]" % (name,))
     print("")
     print("The first form lists the names of all xattrs on the given file(s).")
     print("The second form (-p) prints the value of the xattr attr_name.")
     print("The third form (-w) sets the value of the xattr attr_name to attr_value.")
     print("The fourth form (-d) deletes the xattr attr_name.")
+    print("The fifth form (-c) deletes (clears) all xattrs.")
     print("")
     print("options:")
     print("  -h: print this help")
@@ -82,7 +84,7 @@ def _dump(src, length=16):
 
 def main():
     try:
-        (optargs, args) = getopt.getopt(sys.argv[1:], "hlpwdzs", ["help"])
+        (optargs, args) = getopt.getopt(sys.argv[1:], "hlpwdzsc", ["help"])
     except getopt.GetoptError as e:
         usage(e)
 
@@ -91,6 +93,7 @@ def main():
     read = False
     write = False
     delete = False
+    clear = False
     nofollow = False
     compress = lambda x: x
     decompress = compress
@@ -105,23 +108,27 @@ def main():
             nofollow = True
         elif opt == "-p":
             read = True
-            if write or delete:
-                usage("-p not allowed with -w or -d")
+            if write or delete or clear:
+                usage("-p not allowed with -w, -d or -c")
         elif opt == "-w":
             write = True
-            if read or delete:
-                usage("-w not allowed with -p or -d")
+            if read or delete or clear:
+                usage("-w not allowed with -p, -d or -c")
         elif opt == "-d":
             delete = True
-            if read or write:
-                usage("-d not allowed with -p or -w")
+            if read or write or clear:
+                usage("-d not allowed with -p, -w or -c")
+        elif opt == "-c":
+            clear = True
+            if read or write or delete:
+                usage("-c not allowed with -p, -w or -d")
         elif opt == "-z":
             compress = zlib.compress
             decompress = zlib.decompress
 
-    if write or delete:
+    if write or delete or clear:
         if long_format:
-            usage("-l not allowed with -w or -p")
+            usage("-l not allowed with -w, -d or -c")
 
     if read or write or delete:
         if not args:
@@ -132,6 +139,9 @@ def main():
         if not args:
             usage("No attr_value")
         attr_value = args.pop(0).encode('utf-8')
+
+    if len(args) == 0:
+        usage("No file")
 
     if len(args) > 1:
         multiple_files = True
@@ -170,6 +180,13 @@ def main():
                 continue
             except KeyError:
                 onError("No such xattr: %s" % (attr_name,))
+                continue
+
+        elif clear:
+            try:
+                attrs.clear()
+            except (IOError, OSError) as e:
+                onError(e)
                 continue
 
         else:
