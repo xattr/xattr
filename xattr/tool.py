@@ -62,9 +62,9 @@ def usage(e=None):
     print("  -z: compress or decompress (if compressed) attribute value in zip format")
 
     if e:
-        sys.exit(64)
+        return 64
     else:
-        sys.exit(0)
+        return 0
 
 
 if sys.version_info < (3,):
@@ -87,11 +87,11 @@ def _dump(src, length=16):
     return ''.join(result)
 
 
-def main():
+def main(argv):
     try:
-        (optargs, args) = getopt.getopt(sys.argv[1:], "hlpwdzs", ["help"])
+        (optargs, args) = getopt.getopt(argv[1:], "hlpwdzs", ["help"])
     except getopt.GetoptError as e:
-        usage(e)
+        return usage(e)
 
     attr_name = None
     long_format = False
@@ -105,7 +105,7 @@ def main():
 
     for opt, arg in optargs:
         if opt in ("-h", "--help"):
-            usage()
+            return usage()
         elif opt == "-l":
             long_format = True
         elif opt == "-s":
@@ -113,31 +113,31 @@ def main():
         elif opt == "-p":
             read = True
             if write or delete:
-                usage("-p not allowed with -w or -d")
+                return usage("-p not allowed with -w or -d")
         elif opt == "-w":
             write = True
             if read or delete:
-                usage("-w not allowed with -p or -d")
+                return usage("-w not allowed with -p or -d")
         elif opt == "-d":
             delete = True
             if read or write:
-                usage("-d not allowed with -p or -w")
+                return usage("-d not allowed with -p or -w")
         elif opt == "-z":
             compress = zlib.compress
             decompress = zlib.decompress
 
     if write or delete:
         if long_format:
-            usage("-l not allowed with -w or -p")
+            return usage("-l not allowed with -w or -p")
 
     if read or write or delete:
         if not args:
-            usage("No attr_name")
+            return usage("No attr_name")
         attr_name = args.pop(0)
 
     if write:
         if not args:
-            usage("No attr_value")
+            return usage("No attr_value")
         attr_value = args.pop(0).encode('utf-8')
 
     if len(args) > 1:
@@ -230,7 +230,7 @@ def main():
                     else:
                         print("".join((file_prefix, attr_name)))
 
-    sys.exit(status)
+    return status
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main(sys.argv))
