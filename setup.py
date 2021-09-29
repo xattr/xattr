@@ -49,8 +49,9 @@ setup(
             "xattr = xattr.tool:main",
         ],
     },
-    install_requires=["cffi>=1.0.0"],
-    setup_requires=["cffi>=1.0.0"],
+    # Keep this in sync with pyproject.toml
+    install_requires=["cffi>=1.0"],
+    setup_requires=["cffi>=1.0"],
     cffi_modules=["xattr/lib_build.py:ffi"],
     test_suite="xattr.tests.all_tests_suite",
     zip_safe=False,
