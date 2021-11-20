@@ -1,3 +1,12 @@
+Version 0.9.8 released 2021-11-19
+
+* Update build to use Github Actions
+  https://github.com/xattr/xattr/pull/95
+* Various dump related fixes
+  https://github.com/xattr/xattr/pull/93
+* Fix classifiers list
+  https://github.com/xattr/xattr/pull/89
+
 Version 0.9.7 released 2019-12-02
 
 * Fix xattr().update() in Python 3
