@@ -5,7 +5,7 @@ import sys
 
 from setuptools import setup
 
-VERSION = '0.9.7'
+VERSION = '0.9.8'
 DESCRIPTION = "Python wrapper for extended filesystem attributes"
 LONG_DESCRIPTION = """
 Extended attributes extend the basic attributes of files and directories
@@ -49,8 +49,9 @@ setup(
             "xattr = xattr.tool:main",
         ],
     },
-    install_requires=["cffi>=1.0.0"],
-    setup_requires=["cffi>=1.0.0"],
+    # Keep this in sync with pyproject.toml
+    install_requires=["cffi>=1.0"],
+    setup_requires=["cffi>=1.0"],
     cffi_modules=["xattr/lib_build.py:ffi"],
     test_suite="xattr.tests.all_tests_suite",
     zip_safe=False,
