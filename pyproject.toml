@@ -1,0 +1,14 @@
+[tool.cibuildwheel]
+test-requires = "pytest"
+test-command = "pytest {project}/xattr/tests"
+
+[tool.cibuildwheel.linux]
+before-all = "yum install -y libffi-devel"
+
+[[tool.cibuildwheel.overrides]]
+select = "*-manylinux2_*"
+before-all = "apt-get -y install libffi-dev"
+
+[[tool.cibuildwheel.overrides]]
+select = "*-musllinux*"
+before-all = "apk add libffi-dev"

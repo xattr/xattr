@@ -64,12 +64,19 @@ def usage(e=None):
     print("  -z: compress or decompress (if compressed) attribute value in zip format")
 
     if e:
-        sys.exit(64)
+        return 64
     else:
-        sys.exit(0)
+        return 0
 
 
-_FILTER = ''.join([(len(repr(chr(x))) == 3) and chr(x) or '.' for x in range(256)])
+if sys.version_info < (3,):
+    ascii = repr
+    uchr = unichr
+else:
+    uchr = chr
+
+
+_FILTER = u''.join([(len(ascii(chr(x))) == 3) and uchr(x) or u'.' for x in range(256)])
 
 
 def _dump(src, length=16):
@@ -82,11 +89,11 @@ def _dump(src, length=16):
     return ''.join(result)
 
 
-def main():
+def main(argv):
     try:
-        (optargs, args) = getopt.getopt(sys.argv[1:], "hlpwdzsc", ["help"])
+        (optargs, args) = getopt.getopt(argv[1:], "hlpwdzsc", ["help"])
     except getopt.GetoptError as e:
-        usage(e)
+        return usage(e)
 
     attr_name = None
     long_format = False
@@ -97,11 +104,11 @@ def main():
     nofollow = False
     compress = lambda x: x
     decompress = compress
-    status = 0
+    errors = []
 
     for opt, arg in optargs:
         if opt in ("-h", "--help"):
-            usage()
+            return usage()
         elif opt == "-l":
             long_format = True
         elif opt == "-s":
@@ -109,39 +116,39 @@ def main():
         elif opt == "-p":
             read = True
             if write or delete or clear:
-                usage("-p not allowed with -w, -d or -c")
+                return usage("-p not allowed with -w, -d or -c")
         elif opt == "-w":
             write = True
             if read or delete or clear:
-                usage("-w not allowed with -p, -d or -c")
+                return usage("-w not allowed with -p, -d or -c")
         elif opt == "-d":
             delete = True
             if read or write or clear:
-                usage("-d not allowed with -p, -w or -c")
+                return usage("-d not allowed with -p, -w or -c")
         elif opt == "-c":
             clear = True
             if read or write or delete:
-                usage("-c not allowed with -p, -w or -d")
+                return usage("-c not allowed with -p, -w or -d")
         elif opt == "-z":
             compress = zlib.compress
             decompress = zlib.decompress
 
     if write or delete or clear:
         if long_format:
-            usage("-l not allowed with -w, -d or -c")
+            return usage("-l not allowed with -w, -d or -c")
 
     if read or write or delete:
         if not args:
-            usage("No attr_name")
+            return usage("No attr_name")
         attr_name = args.pop(0)
 
     if write:
         if not args:
-            usage("No attr_value")
+            return usage("No attr_value")
         attr_value = args.pop(0).encode('utf-8')
 
     if len(args) == 0:
-        usage("No file")
+        return usage("No file")
 
     if len(args) > 1:
         multiple_files = True
@@ -154,6 +161,7 @@ def main():
 
     for filename in args:
         def onError(e):
+            errors.append(e)
             if not os.path.exists(filename):
                 sys.stderr.write("No such file: %s\n" % (filename,))
             else:
@@ -205,31 +213,42 @@ def main():
                 file_prefix = ""
 
             for attr_name in attr_names:
+                should_dump = False
                 try:
                     try:
                         attr_value = decompress(attrs[attr_name])
                     except zlib.error:
                         attr_value = attrs[attr_name]
-                    attr_value = attr_value.decode('utf-8')
+                    try:
+                        if b'\0' in attr_value:
+                            # force dumping
+                            raise NullsInString
+                        attr_value = attr_value.decode('utf-8')
+                    except (UnicodeDecodeError, NullsInString):
+                        attr_value = attr_value.decode('latin-1')
+                        should_dump = True
                 except KeyError:
                     onError("%sNo such xattr: %s" % (file_prefix, attr_name))
                     continue
 
                 if long_format:
-                    try:
-                        if '\0' in attr_value:
-                            raise NullsInString
-                        print("".join((file_prefix, "%s: " % (attr_name,), attr_value)))
-                    except (UnicodeDecodeError, NullsInString):
+                    if should_dump:
                         print("".join((file_prefix, "%s:" % (attr_name,))))
                         print(_dump(attr_value))
+                    else:
+                        print("".join((file_prefix, "%s: " % (attr_name,), attr_value)))
                 else:
                     if read:
-                        print("".join((file_prefix, attr_value)))
+                        if should_dump:
+                            if file_prefix:
+                                print(file_prefix)
+                            print(_dump(attr_value))
+                        else:
+                            print("".join((file_prefix, attr_value)))
                     else:
                         print("".join((file_prefix, attr_name)))
 
-    sys.exit(status)
+    return 1 if errors else 0
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main(sys.argv))

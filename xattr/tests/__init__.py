@@ -6,6 +6,7 @@ import unittest
 def all_tests_suite():
     suite = unittest.TestLoader().loadTestsFromNames([
         'xattr.tests.test_xattr',
+        'xattr.tests.test_tool',
     ])
     return suite
 
