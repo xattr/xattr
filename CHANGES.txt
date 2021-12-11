@@ -1,3 +1,12 @@
+Version 0.9.9 released 2021-12-11
+
+* Fix regression in xattr console script
+  https://github.com/xattr/xattr/pull/100
+* Add -c clear option
+  https://github.com/xattr/xattr/pull/98
+* Add note about Linux namespace requirement
+  https://github.com/xattr/xattr/pull/96
+
 Version 0.9.8 released 2021-11-19
 
 * Update build to use Github Actions

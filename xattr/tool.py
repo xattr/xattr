@@ -89,7 +89,7 @@ def _dump(src, length=16):
     return ''.join(result)
 
 
-def main(argv):
+def main(argv=sys.argv):
     try:
         (optargs, args) = getopt.getopt(argv[1:], "hlpwdzsc", ["help"])
     except getopt.GetoptError as e:
