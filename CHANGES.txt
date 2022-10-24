@@ -1,3 +1,12 @@
+Version 0.10.0 released 2022-10-24
+
+* Remove exec flag from tool.py
+  https://github.com/xattr/xattr/pull/106
+* Update the documentation to mention
+  the attr package and its getfattr and
+  setfattr tools
+  https://github.com/xattr/xattr/pull/103
+
 Version 0.9.9 released 2021-12-11
 
 * Fix regression in xattr console script
