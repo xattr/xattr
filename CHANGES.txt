@@ -1,3 +1,8 @@
+Version 0.10.1 released XXXX-XX-XX
+
+* Updated README to add reference to osxmetadata
+  https://github.com/xattr/xattr/pull/110
+
 Version 0.10.0 released 2022-10-24
 
 * Remove exec flag from tool.py

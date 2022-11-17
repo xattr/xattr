@@ -5,7 +5,7 @@ import sys
 
 from setuptools import setup
 
-VERSION = '0.10.0'
+VERSION = '0.10.1'
 DESCRIPTION = "Python wrapper for extended filesystem attributes"
 LONG_DESCRIPTION = """
 Extended attributes extend the basic attributes of files and directories
