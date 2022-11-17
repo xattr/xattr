@@ -20,3 +20,10 @@ and Linux 2.6+. Experimental support is included for Solaris and FreeBSD.
 
 Note: On Linux, custom xattr keys need to be prefixed with the `user`
 namespace, ie: `user.your_attr`.
+
+Note: If you need to read or write Spotlight metadata attributes on macOS,
+see osxmetadata_ which provides a native macOS means to do so without
+directly manipulating extended attributes. osxmetadata also provides access
+to other macOS metadata attributes and extended attributes via xattr.
+
+.. _osxmetadata: https://github.com/RhetTbull/osxmetadata
