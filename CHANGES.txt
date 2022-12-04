@@ -1,5 +1,7 @@
-Version 0.10.1 released XXXX-XX-XX
+Version 0.10.1 released 2022-12-03
 
+* Update github actions
+  https://github.com/xattr/xattr/issues/112
 * Updated README to add reference to osxmetadata
   https://github.com/xattr/xattr/pull/110
 
