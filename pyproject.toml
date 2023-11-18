@@ -1,3 +1,11 @@
+[build-system]
+requires = [
+    "setuptools",
+    "cffi>=1.0",
+]
+
+build-backend = "setuptools.build_meta"
+
 [tool.cibuildwheel]
 test-requires = "pytest"
 test-command = "pytest {project}/xattr/tests"

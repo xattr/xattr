@@ -1,3 +1,8 @@
+Version 0.10.2 released 2023-11-17
+
+* Update test & build matrix and use Github Actions as a Trusted Publisher
+  https://github.com/xattr/xattr/issues/115
+
 Version 0.10.1 released 2022-12-03
 
 * Update github actions

@@ -1,1 +1,2 @@
 cffi>=1.0
+setuptools

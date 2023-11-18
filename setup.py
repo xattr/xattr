@@ -1,11 +1,8 @@
 #!/usr/bin/env python
 
-import os
-import sys
-
 from setuptools import setup
 
-VERSION = '0.10.1'
+VERSION = '0.10.2'
 DESCRIPTION = "Python wrapper for extended filesystem attributes"
 LONG_DESCRIPTION = """
 Extended attributes extend the basic attributes of files and directories
@@ -39,7 +36,7 @@ setup(
     classifiers=CLASSIFIERS,
     author="Bob Ippolito",
     author_email="bob@redivi.com",
-    url="http://github.com/xattr/xattr",
+    url="https://github.com/xattr/xattr",
     license="MIT License",
     packages=['xattr'],
     ext_package='xattr',
