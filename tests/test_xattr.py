@@ -13,21 +13,6 @@ class BaseTestXattr(object):
     # manual override here.
     TESTDIR = None
 
-    def test_attr_fs_encoding_unicode(self):
-        # Not using setlocale(LC_ALL, ..) to set locale because
-        # sys.getfilesystemencoding() implementation falls back
-        # to user's preferred locale by calling setlocale(LC_ALL, '').
-        xattr.compat.fs_encoding = 'UTF-8'
-        self._test_attr()
-
-    def test_attr_fs_encoding_ascii(self):
-        xattr.compat.fs_encoding = 'US-ASCII'
-        if sys.version_info[0] < 3:
-            with self.assertRaises(UnicodeEncodeError):
-                self._test_attr()
-        else:
-            self._test_attr()
-
     def test_update(self):
         x = xattr.xattr(self.tempfile)
         attrs = {
@@ -38,7 +23,7 @@ class BaseTestXattr(object):
         for k, v in attrs.items():
             self.assertEqual(x[k], v)
 
-    def _test_attr(self):
+    def test_attr(self):
         x = xattr.xattr(self.tempfile)
 
         # Solaris 11 and forward contain system attributes (file flags) in
@@ -88,10 +73,7 @@ class BaseTestXattr(object):
             x['abc'] = u'abc'
         self.assertRaises(TypeError, assign)
 
-        if sys.version_info[0] >= 3:
-            msg = "Value must be bytes, str was passed."
-        else:
-            msg = "Value must be bytes, unicode was passed."
+        msg = "Value must be bytes, str was passed."
 
         try:
             assign()
@@ -135,17 +117,9 @@ class TestDir(TestCase, BaseTestXattr):
         os.rmdir(self.tempfile)
 
 
-try:
-    # SkipTest is only available in Python 2.7+
-    unittest.SkipTest
-except AttributeError:
-    pass
-else:
-    class TestFileWithSurrogates(TestFile):
-        def setUp(self):
-            if sys.platform not in ('linux', 'linux2'):
-                raise unittest.SkipTest('Files with invalid encoded names are only supported under linux')
-            if sys.version_info[0] < 3:
-                raise unittest.SkipTest('Test is only available on Python3') # surrogateescape not avail in py2
-            self.tempfile = NamedTemporaryFile(prefix=b'invalid-\xe9'.decode('utf8','surrogateescape'), dir=self.TESTDIR)
-            self.tempfilename = self.tempfile.name
+class TestFileWithSurrogates(TestFile):
+    def setUp(self):
+        if sys.platform not in ('linux', 'linux2'):
+            raise unittest.SkipTest('Files with invalid encoded names are only supported under linux')
+        self.tempfile = NamedTemporaryFile(prefix=b'invalid-\xe9'.decode('utf8','surrogateescape'), dir=self.TESTDIR)
+        self.tempfilename = self.tempfile.name

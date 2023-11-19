@@ -1,6 +1,58 @@
+[build-system]
+requires = [
+    "setuptools>=68",
+    "wheel",
+    "cffi>=1.16.0",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+requires-python = ">= 3.8"
+name = "xattr"
+version = "1.0.0"
+readme = "README.rst"
+dependencies = [
+    "cffi>=1.16.0",
+]
+authors = [
+    {name = "Bob Ippolito", email = "bob@redivi.com"},
+]
+maintainers = [
+    {name = "Bob Ippolito", email = "bob@redivi.com"},
+]
+description="Python wrapper for extended filesystem attributes"
+license = { file = "LICENSE.txt" }
+keywords = ["xattr"]
+classifiers = [
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: POSIX :: BSD :: FreeBSD",
+    "Operating System :: POSIX :: SunOS/Solaris",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[project.urls]
+Homepage = "https://github.com/xattr/xattr"
+Repository = "https://github.com/xattr/xattr"
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[project.scripts]
+xattr = "xattr.tool:main"
+
+[tool.setuptools]
+packages = ["xattr"]
+
 [tool.cibuildwheel]
 test-requires = "pytest"
-test-command = "pytest {project}/xattr/tests"
+test-command = "pytest {project}/tests"
 
 [tool.cibuildwheel.linux]
 before-all = "yum install -y libffi-devel"

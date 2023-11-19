@@ -1,3 +1,10 @@
+Version 1.0.0 released 2023-11-19
+
+* Update test & build matrix and use Github Actions as a Trusted Publisher.
+  Drop support for Python 3.7 and earlier (including Python 2).
+  Move tests out of package.
+  https://github.com/xattr/xattr/issues/115
+
 Version 0.10.1 released 2022-12-03
 
 * Update github actions
