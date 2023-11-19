@@ -67,14 +67,7 @@ def usage(e=None):
         return 0
 
 
-if sys.version_info < (3,):
-    ascii = repr
-    uchr = unichr
-else:
-    uchr = chr
-
-
-_FILTER = u''.join([(len(ascii(chr(x))) == 3) and uchr(x) or u'.' for x in range(256)])
+_FILTER = u''.join([(len(ascii(chr(x))) == 3) and chr(x) or u'.' for x in range(256)])
 
 
 def _dump(src, length=16):
