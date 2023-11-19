@@ -1,13 +1,7 @@
 import os
 import sys
 
-from .compat import fs_encode
-
-try:
-    from ._lib import lib, ffi
-except ImportError:
-    from .lib_build import ffi, c_source
-    lib = ffi.verify(c_source)
+from ._lib import lib, ffi
 
 XATTR_NOFOLLOW = lib.XATTR_XATTR_NOFOLLOW
 XATTR_CREATE = lib.XATTR_XATTR_CREATE
@@ -39,8 +33,8 @@ def _getxattr(path, name, size=0, position=0, options=0):
     """
     getxattr(path, name, size=0, position=0, options=0) -> str
     """
-    path = fs_encode(path)
-    name = fs_encode(name)
+    path = os.fsencode(path)
+    name = os.fsencode(name)
     if size == 0:
         res = lib.xattr_getxattr(path, name, ffi.NULL, 0, position, options)
         if res == -1:
@@ -57,7 +51,7 @@ def _fgetxattr(fd, name, size=0, position=0, options=0):
     """
     fgetxattr(fd, name, size=0, position=0, options=0) -> str
     """
-    name = fs_encode(name)
+    name = os.fsencode(name)
     if size == 0:
         res = lib.xattr_fgetxattr(fd, name, ffi.NULL, 0, position, options)
         if res == -1:
@@ -75,8 +69,8 @@ def _setxattr(path, name, value, position=0, options=0):
     setxattr(path, name, value, position=0, options=0) -> None
     """
     _check_bytes(value)
-    path = fs_encode(path)
-    name = fs_encode(name)
+    path = os.fsencode(path)
+    name = os.fsencode(name)
     res = lib.xattr_setxattr(path, name, value, len(value), position, options)
     if res:
         raise error(path)
@@ -87,7 +81,7 @@ def _fsetxattr(fd, name, value, position=0, options=0):
     fsetxattr(fd, name, value, position=0, options=0) -> None
     """
     _check_bytes(value)
-    name = fs_encode(name)
+    name = os.fsencode(name)
     res = lib.xattr_fsetxattr(fd, name, value, len(value), position, options)
     if res:
         raise error()
@@ -97,8 +91,8 @@ def _removexattr(path, name, options=0):
     """
     removexattr(path, name, options=0) -> None
     """
-    path = fs_encode(path)
-    name = fs_encode(name)
+    path = os.fsencode(path)
+    name = os.fsencode(name)
     res = lib.xattr_removexattr(path, name, options)
     if res:
         raise error(path)
@@ -108,7 +102,7 @@ def _fremovexattr(fd, name, options=0):
     """
     fremovexattr(fd, name, options=0) -> None
     """
-    name = fs_encode(name)
+    name = os.fsencode(name)
     res = lib.xattr_fremovexattr(fd, name, options)
     if res:
         raise error()
@@ -118,7 +112,7 @@ def _listxattr(path, options=0):
     """
     listxattr(path, options=0) -> str
     """
-    path = fs_encode(path)
+    path = os.fsencode(path)
     res = lib.xattr_listxattr(path, ffi.NULL, 0, options)
     if res == -1:
         raise error(path)

@@ -7,9 +7,8 @@ The xattr type wraps a path or file descriptor with a dict-like interface
 that exposes these extended attributes.
 """
 
-__version__ = '0.10.2'
+__version__ = '1.0.0'
 
-from .compat import integer_types
 from .lib import (XATTR_NOFOLLOW, XATTR_CREATE, XATTR_REPLACE,
     XATTR_NOSECURITY, XATTR_MAXNAMELEN, XATTR_FINDERINFO_NAME,
     XATTR_RESOURCEFORK_NAME, _getxattr, _fgetxattr, _setxattr, _fsetxattr,
@@ -47,14 +46,14 @@ class xattr(object):
             self.value = obj
 
     def __repr__(self):
-        if isinstance(self.value, integer_types):
+        if isinstance(self.value, int):
             flavor = "fd"
         else:
             flavor = "file"
         return "<%s %s=%r>" % (type(self).__name__, flavor, self.value)
 
     def _call(self, name_func, fd_func, *args):
-        if isinstance(self.value, integer_types):
+        if isinstance(self.value, int):
             return fd_func(self.value, *args)
         else:
             return name_func(self.value, *args)
