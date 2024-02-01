@@ -7,11 +7,12 @@ The xattr type wraps a path or file descriptor with a dict-like interface
 that exposes these extended attributes.
 """
 
-__version__ = '1.0.0'
+__version__ = '1.1.0'
 
 from .lib import (XATTR_NOFOLLOW, XATTR_CREATE, XATTR_REPLACE,
     XATTR_NOSECURITY, XATTR_MAXNAMELEN, XATTR_FINDERINFO_NAME,
-    XATTR_RESOURCEFORK_NAME, _getxattr, _fgetxattr, _setxattr, _fsetxattr,
+    XATTR_RESOURCEFORK_NAME, XATTR_COMPAT_USER_PREFIX,
+    _getxattr, _fgetxattr, _setxattr, _fsetxattr,
     _removexattr, _fremovexattr, _listxattr, _flistxattr)
 
 
@@ -94,7 +95,7 @@ class xattr(object):
         """
         res = self._call(_listxattr, _flistxattr, options | self.options).split(b'\x00')
         res.pop()
-        return [s.decode('utf-8') for s in res]
+        return [XATTR_COMPAT_USER_PREFIX + s.decode('utf-8') for s in res]
 
     # dict-like methods
 

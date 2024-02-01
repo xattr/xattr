@@ -71,6 +71,27 @@ jobs:
         with:
           path: dist/*.tar.gz
 
+  test_freebsd:
+    name: Test on FreeBSD
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: vmactions/freebsd-vm@v1
+        env:
+          ASSUME_ALWAYS_YES: "YES"
+        with:
+          envs: 'ASSUME_ALWAYS_YES'
+          usesh: true
+          prepare: |
+            set -e
+            pkg update -f
+            pkg install python39 py39-setuptools py39-cffi py39-pytest
+          run: |
+            set -e
+            python3.9 setup.py install
+            python3.9 setup.py build_ext -i
+            python3.9 -mpytest -v
+
   upload_pypi:
     needs: [build_wheels, build_sdist]
     runs-on: ubuntu-latest

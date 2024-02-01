@@ -14,7 +14,22 @@
 
 #ifdef __FreeBSD__
 
+#define XATTR_COMPAT_ADD_USER_PREFIX 1
+
 /* FreeBSD compatibility API */
+
+/* FreeBSD specifies the namespace separately from the attribute name.
+ * Hence when we set names in the "user" namespace, we should
+ * strip the "user." prefix off said name.
+ *
+ * Normally, this would just be an asthetic difference, but recent versions
+ * of ZFS now refuse to set on FreeBSD any attribute name starting with the
+ * "user." prefix (this is to allow filesystems to be compatible across
+ * FreeBSD and Linux systems without ambiguity.)
+ *
+ * More details here: https://github.com/openzfs/zfs/commit/5c0061345b824eebe7a6578528f873ffcaae1cdd
+ */
+
 #define XATTR_XATTR_NOFOLLOW 0x0001
 #define XATTR_XATTR_CREATE 0x0002
 #define XATTR_XATTR_REPLACE 0x0004
@@ -23,17 +38,30 @@
 #define XATTR_CREATE 0x1
 #define XATTR_REPLACE 0x2
 
-/* Converts a freebsd format attribute list into a NULL terminated list.
+static const char *strip_user_prefix(const char *name)
+{
+    char *stripped_name = (char *)name;
+
+    while (!strncmp(stripped_name, "user.", 5)) {
+        stripped_name += 5;
+    }
+
+    return stripped_name;
+}
+
+/* Converts a FreeBSD format attribute list into a NULL terminated list.
  * The first byte is the length of the following attribute.
+ * The "user." prefix is added for compatibility with other platforms in the
+ * Python interface.
  */
 static void convert_bsd_list(char *namebuf, size_t size)
 {
     size_t offset = 0;
-    while(offset < size) {
-        int length = (int) (unsigned char)namebuf[offset];
-        memmove(namebuf+offset, namebuf+offset+1, length);
-        namebuf[offset+length] = '\0';
-        offset += length+1;
+    while (offset < size) {
+        size_t length = (size_t)(unsigned char)namebuf[offset];
+        memmove(namebuf + offset, namebuf + offset + 1, length);
+        namebuf[offset + length] = '\0';
+        offset += length + 1;
     }
 }
 
@@ -48,11 +76,11 @@ static ssize_t xattr_getxattr(const char *path, const char *name,
 
     if (options & XATTR_XATTR_NOFOLLOW) {
         return extattr_get_link(path, EXTATTR_NAMESPACE_USER,
-                                name, value, size);
+                                strip_user_prefix(name), value, size);
     }
     else {
         return extattr_get_file(path, EXTATTR_NAMESPACE_USER,
-                                name, value, size);
+                                strip_user_prefix(name), value, size);
     }
 }
 
@@ -60,7 +88,7 @@ static ssize_t xattr_setxattr(const char *path, const char *name,
                               void *value, ssize_t size, u_int32_t position,
                               int options)
 {
-    int rv = 0;
+    size_t rv = 0;
     int nofollow;
 
     if (position != 0) {
@@ -83,14 +111,14 @@ static ssize_t xattr_setxattr(const char *path, const char *name,
 
     if (nofollow) {
         rv = extattr_set_link(path, EXTATTR_NAMESPACE_USER,
-                                name, value, size);
+                                strip_user_prefix(name), value, size);
     }
     else {
         rv = extattr_set_file(path, EXTATTR_NAMESPACE_USER,
-                                name, value, size);
+                                strip_user_prefix(name), value, size);
     }
 
-    /* freebsd returns the written length on success, not zero. */
+    /* FreeBSD returns the written length on success, not zero. */
     if (rv >= 0) {
         return 0;
     }
@@ -108,13 +136,12 @@ static ssize_t xattr_removexattr(const char *path, const char *name,
     }
 
     if (options & XATTR_XATTR_NOFOLLOW) {
-        return extattr_delete_link(path, EXTATTR_NAMESPACE_USER, name);
+        return extattr_delete_link(path, EXTATTR_NAMESPACE_USER, strip_user_prefix(name));
     }
     else {
-        return extattr_delete_file(path, EXTATTR_NAMESPACE_USER, name);
+        return extattr_delete_file(path, EXTATTR_NAMESPACE_USER, strip_user_prefix(name));
     }
 }
-
 
 static ssize_t xattr_listxattr(const char *path, char *namebuf,
                                size_t size, int options)
@@ -151,14 +178,14 @@ static ssize_t xattr_fgetxattr(int fd, const char *name, void *value,
         return -1;
     }
     else {
-        return extattr_get_fd(fd, EXTATTR_NAMESPACE_USER, name, value, size);
+        return extattr_get_fd(fd, EXTATTR_NAMESPACE_USER, strip_user_prefix(name), value, size);
     }
 }
 
 static ssize_t xattr_fsetxattr(int fd, const char *name, void *value,
                                ssize_t size, u_int32_t position, int options)
 {
-    int rv = 0;
+    size_t rv = 0;
     int nofollow;
 
     if (position != 0) {
@@ -170,7 +197,7 @@ static ssize_t xattr_fsetxattr(int fd, const char *name, void *value,
 
     if (options == XATTR_XATTR_CREATE ||
         options == XATTR_XATTR_REPLACE) {
-        /* freebsd noop */
+        /* FreeBSD noop */
     }
     else if (options != 0) {
         return -1;
@@ -181,10 +208,10 @@ static ssize_t xattr_fsetxattr(int fd, const char *name, void *value,
     }
     else {
         rv = extattr_set_fd(fd, EXTATTR_NAMESPACE_USER,
-                            name, value, size);
+                            strip_user_prefix(name), value, size);
     }
 
-    /* freebsd returns the written length on success, not zero. */
+    /* FreeBSD returns the written length on success, not zero. */
     if (rv >= 0) {
         return 0;
     }
@@ -205,7 +232,7 @@ static ssize_t xattr_fremovexattr(int fd, const char *name, int options)
         return -1;
     }
     else {
-        return extattr_delete_fd(fd, EXTATTR_NAMESPACE_USER, name);
+        return extattr_delete_fd(fd, EXTATTR_NAMESPACE_USER, strip_user_prefix(name));
     }
 }
 
@@ -562,4 +589,8 @@ static ssize_t xattr_flistxattr(int fd, char *namebuf, size_t size, int options)
 
 #ifndef XATTR_MAXNAMELEN
 #define XATTR_MAXNAMELEN 127
+#endif
+
+#ifndef XATTR_COMPAT_ADD_USER_PREFIX
+#define XATTR_COMPAT_ADD_USER_PREFIX 0
 #endif

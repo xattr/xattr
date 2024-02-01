@@ -5,6 +5,7 @@ from unittest import TestCase
 from tempfile import mkdtemp, NamedTemporaryFile
 
 import xattr
+from xattr import pyxattr_compat
 
 
 class BaseTestXattr(object):
@@ -98,6 +99,24 @@ class BaseTestXattr(object):
         finally:
             os.remove(symlinkPath)
 
+    def test_freebsd_compat_prefix(self):
+        if not sys.platform.startswith('freebsd'):
+            raise unittest.SkipTest("FreeBSD only")
+        x = xattr.xattr(self.tempfile)
+        # Test setting and getting without prefix
+        x['test'] = b'test'
+        self.assertEqual(x['test'], b'test')
+        self.assertEqual(x['user.test'], b'test')
+        self.assertEqual(x['user.user.test'], b'test')
+        # Test setting with prefix
+        x['user.test'] = b'test2'
+        self.assertEqual(x['test'], b'test2')
+        self.assertEqual(x['user.test'], b'test2')
+        # Test that listing returns the prefixed attribute
+        self.assertEqual(x.list(), ['user.test'])
+        # Test that listing with pyxattr_compat does not prefix or decode
+        self.assertEqual(pyxattr_compat.list(self.tempfile), [b'test'])
+
 
 class TestFile(TestCase, BaseTestXattr):
     def setUp(self):
@@ -119,7 +138,7 @@ class TestDir(TestCase, BaseTestXattr):
 
 class TestFileWithSurrogates(TestFile):
     def setUp(self):
-        if sys.platform not in ('linux', 'linux2'):
-            raise unittest.SkipTest('Files with invalid encoded names are only supported under linux')
-        self.tempfile = NamedTemporaryFile(prefix=b'invalid-\xe9'.decode('utf8','surrogateescape'), dir=self.TESTDIR)
+        if not (sys.platform.startswith('linux') or sys.platform.startswith('freebsd')):
+            raise unittest.SkipTest('Files with invalid encoded names are only supported under Linux and FreeBSD')
+        self.tempfile = NamedTemporaryFile(prefix=b'invalid-\xe9'.decode('utf8', 'surrogateescape'), dir=self.TESTDIR)
         self.tempfilename = self.tempfile.name
