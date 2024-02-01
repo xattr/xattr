@@ -80,6 +80,7 @@ jobs:
         env:
           ASSUME_ALWAYS_YES: "YES"
         with:
+          envs: 'ASSUME_ALWAYS_YES'
           usesh: true
           prepare: |
             set -e
