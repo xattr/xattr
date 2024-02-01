@@ -89,6 +89,7 @@ jobs:
           run: |
             set -e
             python3.9 setup.py install
+            python3.9 setup.py build_ext -i
             python3.9 -mpytest -v
 
   upload_pypi:
