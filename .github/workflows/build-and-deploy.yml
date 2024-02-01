@@ -88,8 +88,8 @@ jobs:
             pkg install python39 py39-setuptools py39-cffi py39-pytest
           run: |
             set -e
-            python3 setup.py install
-            python3 -mpytest -v
+            python3.9 setup.py install
+            python3.9 -mpytest -v
 
   upload_pypi:
     needs: [build_wheels, build_sdist]
