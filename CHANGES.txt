@@ -3,6 +3,7 @@ Version 1.1.0 released 2024-02-01
 * Improve FreeBSD compatibility by stripping "user." prefix on attribute
   names, but add them when listing attributes so that it behaves similarly
   to Linux (the xattr.pyxattr_compat module does not add them).
+  Also adds FreeBSD with its ports build of Python 3.9 to the CI test suite.
   https://github.com/xattr/xattr/issues/116
   https://github.com/xattr/xattr/pull/117
 
