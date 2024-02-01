@@ -160,8 +160,7 @@ static ssize_t xattr_listxattr(const char *path, char *namebuf,
     }
 
     if (rv > 0 && namebuf) {
-        convert_bsd_list(namebuf, size);
-        return size;
+        convert_bsd_list(namebuf, rv);
     }
 
     return rv;
@@ -255,8 +254,7 @@ static ssize_t xattr_flistxattr(int fd, char *namebuf, size_t size, int options)
     }
 
     if (rv > 0 && namebuf) {
-        convert_bsd_list(namebuf, size);
-        return size;
+        convert_bsd_list(namebuf, rv);
     }
 
     return rv;
