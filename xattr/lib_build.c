@@ -14,6 +14,8 @@
 
 #ifdef __FreeBSD__
 
+#define XATTR_COMPAT_ADD_USER_PREFIX 1
+
 /* FreeBSD compatibility API */
 
 /* FreeBSD specifies the namespace separately from the attribute name.
@@ -47,60 +49,20 @@ static const char *strip_user_prefix(const char *name)
     return stripped_name;
 }
 
-/* As we are prefixing each entry with "user.", amend the length of the to-be-returned
- * namebuf appropriately.
- */
-static int get_new_bsd_buffersize(char *tempbuf, size_t size)
-{
-    /* When called with namebuf == NULL, "extattr_list_*" will return the total size
-     * of the result without actually assigning it (this is so that you can first
-     * call the function with NULL to get the size, then allocate a buffer to the
-     * appropriate size, then call again with a pointer to this buffer to retrieve
-     * the results. Unfortunately, because our total size will be bigger by 5
-     * characters ("user.") for each entry, we need to read the data and manually
-     * modify the result appropriately.
-     */
-
-    size_t rv = size;
-    size_t offset = 0;
-
-    while (offset < size) {
-        offset += (size_t)tempbuf[offset] + 1;
-        rv += 5;
-    }
-
-    return rv;
-}
-
 /* Converts a FreeBSD format attribute list into a NULL terminated list.
  * The first byte is the length of the following attribute.
- * Prefix each attribute name with the prefix "user.", for compatibility
- * with other platforms.
+ * The "user." prefix is added for compatibility with other platforms in the
+ * Python interface.
  */
 static void convert_bsd_list(char *namebuf, size_t size)
 {
-    const char prefix[] = "user.";
-    char *tempbuf;
-    size_t prefix_length = strlen (prefix);
-    size_t offset_in = 0;
-    size_t offset_out = 0;
-    size_t loop;
-
-    if ((tempbuf = (char *)calloc(1, size)) == NULL) {
-        exit (-1);
+    size_t offset = 0;
+    while (offset < size) {
+        size_t length = (size_t)(unsigned char)namebuf[offset];
+        memmove(namebuf + offset, namebuf + offset + 1, length);
+        namebuf[offset + length] = '\0';
+        offset += length + 1;
     }
-
-    while (offset_out < size) {
-        int length = (int) (unsigned char)namebuf[offset_in];
-        memcpy (tempbuf+offset_out, prefix, prefix_length);
-        memcpy (tempbuf+offset_out+prefix_length, namebuf+offset_in+1, length);
-        tempbuf[offset_out+length+prefix_length] = '\0';
-        offset_in += length+1;
-        offset_out += length+1+prefix_length;
-    }
-
-    memcpy (namebuf, tempbuf, size);
-    free (tempbuf);
 }
 
 static ssize_t xattr_getxattr(const char *path, const char *name,
@@ -191,38 +153,10 @@ static ssize_t xattr_listxattr(const char *path, char *namebuf,
     }
 
     if (options & XATTR_XATTR_NOFOLLOW) {
-
         rv = extattr_list_link(path, EXTATTR_NAMESPACE_USER, namebuf, size);
-
-        /* If we are calling this just to establish the length of the
-         * returned buffer (I.E. namebuf == NULL), then we need to
-         * recalculate this value to take into account the addition of
-         * one or more "user." prefixes.
-         */
-        if (rv > 0 && !namebuf) {
-            char *tempbuf;
-
-            if ((tempbuf = (char *)calloc(1, rv)) == NULL) {
-                return -1;
-            }
-            rv = extattr_list_link(path, EXTATTR_NAMESPACE_USER, tempbuf, rv);
-            rv = get_new_bsd_buffersize(tempbuf, rv);
-            free (tempbuf);
-        }
     }
     else {
         rv = extattr_list_file(path, EXTATTR_NAMESPACE_USER, namebuf, size);
-
-        if (rv > 0 && !namebuf) {
-            char *tempbuf;
-
-            if ((tempbuf = (char *)calloc(1, rv)) == NULL) {
-                return -1;
-            }
-            rv = extattr_list_file(path, EXTATTR_NAMESPACE_USER, tempbuf, rv);
-            rv = get_new_bsd_buffersize(tempbuf, rv);
-            free (tempbuf);
-        }
     }
 
     if (rv > 0 && namebuf) {
@@ -318,17 +252,6 @@ static ssize_t xattr_flistxattr(int fd, char *namebuf, size_t size, int options)
     }
     else {
         rv = extattr_list_fd(fd, EXTATTR_NAMESPACE_USER, namebuf, size);
-
-        if (rv > 0 && !namebuf) {
-            char *tempbuf;
-
-            if ((tempbuf = (char *)calloc(1, rv)) == NULL) {
-                return -1;
-            }
-            rv = extattr_list_fd(fd, EXTATTR_NAMESPACE_USER, tempbuf, rv);
-            rv = get_new_bsd_buffersize(tempbuf, rv);
-            free (tempbuf);
-          }
     }
 
     if (rv > 0 && namebuf) {
@@ -668,4 +591,8 @@ static ssize_t xattr_flistxattr(int fd, char *namebuf, size_t size, int options)
 
 #ifndef XATTR_MAXNAMELEN
 #define XATTR_MAXNAMELEN 127
+#endif
+
+#ifndef XATTR_COMPAT_ADD_USER_PREFIX
+#define XATTR_COMPAT_ADD_USER_PREFIX 0
 #endif
