@@ -1,7 +1,8 @@
 import os
 import sys
 
-from ._lib import lib, ffi
+import _cffi_backend # noqa: F401  # required by _lib
+from ._lib import lib, ffi # type: ignore
 
 XATTR_NOFOLLOW = lib.XATTR_XATTR_NOFOLLOW
 XATTR_CREATE = lib.XATTR_XATTR_CREATE
