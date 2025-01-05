@@ -1,3 +1,10 @@
+Version 1.1.1 released 2025-01-05
+
+* Update GitHub actions (with the side-effect of building wheels for
+  Python v3.13)
+  https://github.com/xattr/xattr/issues/123
+  https://github.com/xattr/xattr/pull/124
+
 Version 1.1.0 released 2024-02-01
 
 * Improve FreeBSD compatibility by stripping "user." prefix on attribute
