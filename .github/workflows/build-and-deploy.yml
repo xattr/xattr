@@ -31,7 +31,7 @@ jobs:
           platforms: arm64
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.16.2
+        uses: pypa/cibuildwheel@v2.22.0
         env:
           CIBW_BUILD_FRONTEND: "build"
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
@@ -43,8 +43,8 @@ jobs:
           CIBW_ARCHS_LINUX: "auto aarch64"
           CIBW_ARCHS_MACOS: "x86_64 universal2 arm64"
 
-      - uses: actions/upload-artifact@v3
-        if: "github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')"
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
         with:
           path: ./wheelhouse/*.whl
 
@@ -54,10 +54,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         name: Install Python
         with:
-          python-version: '3.12'
+          python-version: '3.13'
           cache: 'pip'
 
       - name: Install dependencies
@@ -66,8 +66,8 @@ jobs:
       - name: Build sdist
         run: python setup.py sdist
 
-      - uses: actions/upload-artifact@v3
-        if: "github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')"
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
         with:
           path: dist/*.tar.gz
 
@@ -85,12 +85,12 @@ jobs:
           prepare: |
             set -e
             pkg update -f
-            pkg install python39 py39-setuptools py39-cffi py39-pytest
+            pkg install python311 py311-setuptools py311-cffi py311-pytest
           run: |
             set -e
-            python3.9 setup.py install
-            python3.9 setup.py build_ext -i
-            python3.9 -mpytest -v
+            python3.11 setup.py install
+            python3.11 setup.py build_ext -i
+            python3.11 -mpytest -v
 
   upload_pypi:
     needs: [build_wheels, build_sdist]
@@ -101,7 +101,7 @@ jobs:
     permissions:
       id-token: write
     # upload to PyPI on every tag starting with 'v'
-    if: "github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v')"
+    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v')
     # alternatively, to publish when a GitHub Release is created, use the following rule:
     # if: github.event_name == 'release' && github.event.action == 'published'
     steps:
@@ -110,7 +110,7 @@ jobs:
           name: artifact
           path: dist
 
-      - uses: pypa/gh-action-pypi-publish@v1.8.10
+      - uses: pypa/gh-action-pypi-publish@release/v1
 
   upload_pypi_test:
     needs: [build_wheels, build_sdist]
@@ -121,15 +121,15 @@ jobs:
     permissions:
       id-token: write
     # upload to test PyPI on every tag starting with 'test-v'
-    if: "github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/test-v')"
+    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/test-v')
     # alternatively, to publish when a GitHub Release is created, use the following rule:
     # if: github.event_name == 'release' && github.event.action == 'published'
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: artifact
           path: dist
 
-      - uses: pypa/gh-action-pypi-publish@v1.8.10
+      - uses: pypa/gh-action-pypi-publish@release/v1
         with:
           repository-url: https://test.pypi.org/legacy/
