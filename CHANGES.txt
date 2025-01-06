@@ -1,3 +1,8 @@
+Version 1.1.2 released 2025-01-05
+
+* Update GitHub actions to support upload-artifact@v4
+  https://github.com/xattr/xattr/pull/125
+
 Version 1.1.1 released 2025-01-05
 
 * Update GitHub actions (with the side-effect of building wheels for

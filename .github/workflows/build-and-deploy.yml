@@ -44,9 +44,10 @@ jobs:
           CIBW_ARCHS_MACOS: "x86_64 universal2 arm64"
 
       - uses: actions/upload-artifact@v4
-        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
+        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v') && github.ref_type == 'tag'
         with:
           path: ./wheelhouse/*.whl
+          overwrite: true
 
   build_sdist:
     name: Build source distribution
@@ -67,9 +68,10 @@ jobs:
         run: python setup.py sdist
 
       - uses: actions/upload-artifact@v4
-        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
+        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v') && github.ref_type == 'tag'
         with:
           path: dist/*.tar.gz
+          overwrite: true
 
   test_freebsd:
     name: Test on FreeBSD
