@@ -44,9 +44,9 @@ jobs:
           CIBW_ARCHS_MACOS: "x86_64 universal2 arm64"
 
       - uses: actions/upload-artifact@v4
-        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v') && github.ref_type == 'tag'
+        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/') && github.ref_type == 'tag'
         with:
-          name: wheels
+          name: wheels-${{ matrix.os }}
           path: ./wheelhouse/*.whl
 
   build_sdist:
@@ -68,7 +68,7 @@ jobs:
         run: python setup.py sdist
 
       - uses: actions/upload-artifact@v4
-        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v') && github.ref_type == 'tag'
+        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/') && github.ref_type == 'tag'
         with:
           name: sdist
           path: dist/*.tar.gz
@@ -103,7 +103,7 @@ jobs:
     permissions:
       id-token: write
     # upload to PyPI on every tag starting with 'v'
-    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v')
+    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
     # alternatively, to publish when a GitHub Release is created, use the following rule:
     # if: github.event_name == 'release' && github.event.action == 'published'
     steps:
