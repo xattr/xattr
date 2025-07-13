@@ -1,7 +1,9 @@
 Version 1.2.0 released 2025-07-XX
 
-* Ignore macOS 13 SIP attribute 'com.apple.provenance' in tests
+* Support optional default value in xattr.get()
   https://github.com/xattr/xattr/pull/130
+* Ignore macOS 13 SIP attribute 'com.apple.provenance' in tests
+  https://github.com/xattr/xattr/pull/131
 
 Version 1.1.4 released 2025-01-06
 
