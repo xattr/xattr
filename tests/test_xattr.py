@@ -117,6 +117,34 @@ class BaseTestXattr(object):
         # Test that listing with pyxattr_compat does not prefix or decode
         self.assertEqual(pyxattr_compat.list(self.tempfile), [b'test'])
 
+    def test_get_with_default(self):
+        x = xattr.xattr(self.tempfile)
+
+        # Test backwards compatibility - exception raised when no default
+        with self.assertRaises(OSError):
+            x.get('user.nonexistent')
+
+        # Test default=None returns None
+        result = x.get('user.nonexistent', default=None)
+        self.assertIsNone(result)
+
+        # Test default parameter with non-None values
+        result = x.get('user.nonexistent', default=b'default_value')
+        self.assertEqual(result, b'default_value')
+
+        # Test default parameter with empty string
+        result = x.get('user.nonexistent', default=b'')
+        self.assertEqual(result, b'')
+
+        # Test that existing attributes ignore default
+        x['user.existing'] = b'real_value'
+        result = x.get('user.existing', default=b'should_be_ignored')
+        self.assertEqual(result, b'real_value')
+
+        # Test that default is keyword-only (positional should fail)
+        with self.assertRaises(TypeError):
+            x.get('user.nonexistent', 0, b'default_value')
+
 
 class TestFile(TestCase, BaseTestXattr):
     def setUp(self):

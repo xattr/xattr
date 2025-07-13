@@ -9,6 +9,8 @@ that exposes these extended attributes.
 
 __version__ = '1.1.4'
 
+import errno
+
 from .lib import (XATTR_NOFOLLOW, XATTR_CREATE, XATTR_REPLACE,
     XATTR_NOSECURITY, XATTR_MAXNAMELEN, XATTR_FINDERINFO_NAME,
     XATTR_RESOURCEFORK_NAME, XATTR_COMPAT_USER_PREFIX,
@@ -21,6 +23,9 @@ __all__ = [
     "XATTR_MAXNAMELEN", "XATTR_FINDERINFO_NAME", "XATTR_RESOURCEFORK_NAME",
     "xattr", "listxattr", "getxattr", "setxattr", "removexattr"
 ]
+
+
+_SENTINEL_MISSING = object()
 
 
 class xattr(object):
@@ -59,14 +64,19 @@ class xattr(object):
         else:
             return name_func(self.value, *args)
 
-    def get(self, name, options=0):
+    def get(self, name, options=0, *, default=_SENTINEL_MISSING):
         """
         Retrieve the extended attribute ``name`` as a ``str``.
-        Raises ``IOError`` on failure.
+        Raises ``IOError`` on failure unless default is provided.
 
         See x-man-page://2/getxattr for options and possible errors.
         """
-        return self._call(_getxattr, _fgetxattr, name, 0, 0, options | self.options)
+        try:
+            return self._call(_getxattr, _fgetxattr, name, 0, 0, options | self.options)
+        except OSError as e:
+            if errno.ENOATTR in str(e) and default is not _SENTINEL_MISSING:
+                return default
+            raise
 
     def set(self, name, value, options=0):
         """
