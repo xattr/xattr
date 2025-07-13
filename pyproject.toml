@@ -20,12 +20,13 @@ authors = [
 maintainers = [
     {name = "Bob Ippolito", email = "bob@redivi.com"},
 ]
-description = "Python wrapper for extended filesystem attributes"
-license = "MIT"
+description="Python wrapper for extended filesystem attributes"
+license = { file = "LICENSE.txt" }
 keywords = ["xattr"]
 classifiers = [
     "Environment :: Console",
     "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
     "Operating System :: MacOS :: MacOS X",
     "Operating System :: POSIX :: Linux",
