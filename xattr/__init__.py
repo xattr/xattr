@@ -74,7 +74,7 @@ class xattr(object):
         try:
             return self._call(_getxattr, _fgetxattr, name, 0, 0, options | self.options)
         except OSError as e:
-            if errno.ENOATTR in str(e) and default is not _SENTINEL_MISSING:
+            if default is not _SENTINEL_MISSING and e.errno == errno.ENOATTR:
                 return default
             raise
 
