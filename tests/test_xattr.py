@@ -35,13 +35,13 @@ class BaseTestXattr(object):
             d['SUNWattr_ro'] = x['SUNWattr_ro']
             d['SUNWattr_rw'] = x['SUNWattr_rw']
 
-        # SELinux systems use an attribute which must be accounted for
-        if sys.platform.startswith('linux') and 'security.selinux' in x:
-            d['security.selinux'] = x['security.selinux']
-
         # macOS 13.x SIP adds this attribute to all files
-        if x.has_key('com.apple.provenance'):
-            d['com.apple.provenance'] = x['com.apple.provenance']
+        # POSIX platforms may have system.posix_acl_default
+        # SELinux systems use an attribute which must be accounted for
+        IGNORE_KEYS = ['com.apple.provenance', 'system.posix_acl_default', 'security.selinux']
+        for k in IGNORE_KEYS:
+            if x.has_key(k):
+                d[k] = x[k]
 
         self.assertEqual(list(x.keys()), list(d.keys()))
         self.assertEqual(list(x.list()), list(d.keys()))

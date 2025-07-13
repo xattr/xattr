@@ -26,6 +26,11 @@ __all__ = [
 
 
 _SENTINEL_MISSING = object()
+ERRNO_MISSING = set()
+try:
+    ERRNO_MISSING.add(errno.ENOATTR)
+except AttributeError:
+    ERRNO_MISSING.add(errno.ENODATA)
 
 
 class xattr(object):
@@ -74,7 +79,7 @@ class xattr(object):
         try:
             return self._call(_getxattr, _fgetxattr, name, 0, 0, options | self.options)
         except OSError as e:
-            if default is not _SENTINEL_MISSING and e.errno == errno.ENOATTR:
+            if default is not _SENTINEL_MISSING and e.errno in ERRNO_MISSING:
                 return default
             raise
 
