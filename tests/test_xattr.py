@@ -39,6 +39,10 @@ class BaseTestXattr(object):
         if sys.platform.startswith('linux') and 'security.selinux' in x:
             d['security.selinux'] = x['security.selinux']
 
+        # macOS 13.x SIP adds this attribute to all files
+        if x.has_key('com.apple.provenance'):
+            d['com.apple.provenance'] = x['com.apple.provenance']
+
         self.assertEqual(list(x.keys()), list(d.keys()))
         self.assertEqual(list(x.list()), list(d.keys()))
         self.assertEqual(dict(x), d)
@@ -94,7 +98,9 @@ class BaseTestXattr(object):
                 # Solaris, Linux don't support extended attributes on symlinks
                 raise unittest.SkipTest("XATTRs on symlink not allowed"
                                         " on filesystem/platform")
-            self.assertEqual(dict(realfile), {})
+            realfile_xattrs = dict(realfile)
+            realfile_xattrs.pop('com.apple.provenance', None)
+            self.assertEqual(realfile_xattrs, {})
             self.assertEqual(symlink['user.islink'], b'true')
         finally:
             os.remove(symlinkPath)
