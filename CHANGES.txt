@@ -1,4 +1,4 @@
-Version 1.2.0 released 2025-07-XX
+Version 1.2.0 released 2025-07-13
 
 * Support optional default value in xattr.get()
   https://github.com/xattr/xattr/pull/130
