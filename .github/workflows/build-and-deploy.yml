@@ -87,12 +87,12 @@ jobs:
           prepare: |
             set -e
             pkg update -f
-            pkg install python312 py312-setuptools py312-cffi py312-pytest
+            pkg install python311 py311-setuptools py311-cffi py311-pytest
           run: |
             set -e
-            python3.12 setup.py install
-            python3.12 setup.py build_ext -i
-            python3.12 -mpytest -v
+            python3.11 setup.py install
+            python3.11 setup.py build_ext -i
+            python3.11 -mpytest -v
 
   upload_pypi:
     needs: [build_wheels, build_sdist]
