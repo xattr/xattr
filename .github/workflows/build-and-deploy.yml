@@ -87,12 +87,12 @@ jobs:
           prepare: |
             set -e
             pkg update -f
-            pkg install python311 py311-setuptools py311-cffi py311-pytest
+            pkg install python312 uv
           run: |
             set -e
-            python3.11 setup.py install
-            python3.11 setup.py build_ext -i
-            python3.11 -mpytest -v
+            uv venv
+            uv pip install -e .
+            uv run --all-extras pytest tests
 
   upload_pypi:
     needs: [build_wheels, build_sdist]
