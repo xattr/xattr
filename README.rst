@@ -15,8 +15,7 @@ file system objects (files, directories, symlinks, etc).
 Extended attributes are currently only available on Darwin 8.0+ (Mac OS X 10.4)
 and Linux 2.6+. Experimental support is included for Solaris and FreeBSD.
 
-Python 3.8+ is required as of v1.0.0, and this is the minimum version
-that is compatible with Python 3.12+.
+Python 3.9+ is required as of v1.3.0.
 
 Versions older than v1.0.0 are no longer supported, but are
 available for use. v0.10.1 is the last version to support older versions
