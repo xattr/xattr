@@ -8,9 +8,7 @@ This module provides compatibility for the pyxattr API.
 
 import sys
 
-from .lib import (XATTR_NOFOLLOW, XATTR_CREATE, XATTR_REPLACE,
-    XATTR_NOSECURITY, XATTR_MAXNAMELEN, XATTR_FINDERINFO_NAME,
-    XATTR_RESOURCEFORK_NAME, _getxattr, _fgetxattr, _setxattr, _fsetxattr,
+from .lib import (XATTR_NOFOLLOW, _getxattr, _fgetxattr, _setxattr, _fsetxattr,
     _removexattr, _fremovexattr, _listxattr, _flistxattr)
 
 __all__ = [
