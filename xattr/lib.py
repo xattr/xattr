@@ -1,5 +1,4 @@
 import os
-import sys
 
 from ._lib import lib, ffi
 
